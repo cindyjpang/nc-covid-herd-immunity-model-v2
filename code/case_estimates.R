@@ -5,7 +5,7 @@
 ###
 ### Written by: Cindy Pang
 
-setwd("C:/Users/cindy/nc-covid-herd-immunity-model")
+setwd("C:/Users/cindy/nc-covid-herd-immunity-model-v2")
 # import packages
 library(readr)
 library(readxl)

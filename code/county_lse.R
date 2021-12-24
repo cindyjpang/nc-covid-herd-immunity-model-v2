@@ -17,7 +17,7 @@
 ## Methods: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7570398/
 ## ---------------------------
 
-setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model")
+setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2")
 library(readxl)
 library(tidyverse)
 library(dplyr)

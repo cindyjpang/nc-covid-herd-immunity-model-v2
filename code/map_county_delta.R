@@ -15,7 +15,7 @@
 ##
 ## ---------------------------
 
-setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model")
+setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2")
 library(tmap)
 library(sf)
 library(readxl)
@@ -24,8 +24,8 @@ library(tidyverse)
 library(rsconnect)
 library(dplyr)
 
-shp <- st_read("C:\\Users\\cindy\\nc-covid-herd-immunity-model\\data\\nc shapefile\\counties.shp")
-dat <- read_excel("C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\delta_county_summary.xlsx")
+shp <- st_read("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\data\\nc shapefile\\counties.shp")
+dat <- read_excel("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\delta_county_summary.xlsx")
 
 
 
