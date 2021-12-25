@@ -12,6 +12,7 @@ library(sf)
 library(RColorBrewer)
 library(rsconnect)
 library(vtable)
+
 # import files
 immunity_est <- read_excel("exported data/immunity_est.xlsx")
 delta_proj <- read_excel("exported data/delta_proj.xlsx")
