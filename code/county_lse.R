@@ -136,10 +136,10 @@ delta_summary_dat <- merge(delta_summary_dat,
                           delta_params,
                           by = c('COUNTY'),
                           all = TRUE)
-write_xlsx(delta_summary_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\delta_county_summary.xlsx')
+write_xlsx(delta_summary_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\delta_county_summary.xlsx')
 #write_xlsx(delta_params, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\delta_params.xlsx')
 delta_proj_dat$COUNTY <- as.factor(delta_proj_dat$COUNTY)
 delta_proj_dat%>%
   ggplot(aes(x=DATE, y=I, group=COUNTY, color=COUNTY))+
   geom_line()
-
+write_xlsx(delta_proj_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\delta_proj.xlsx')
