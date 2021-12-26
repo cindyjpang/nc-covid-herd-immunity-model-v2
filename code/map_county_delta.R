@@ -25,9 +25,10 @@ library(rsconnect)
 library(dplyr)
 library(ggplot2)
 library(ggpubr)
-
+library(viridis)
 shp <- st_read("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\data\\nc shapefile\\counties.shp")
 dat <- read_excel("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\delta_county_summary.xlsx")
+immunity_est <- read_excel("exported data\\immunity_est.xlsx")
 immunity_dat <- read_excel("exported data\\immunity_vc.xlsx")
 
 
@@ -57,7 +58,9 @@ nc_dat$hit_pct <- nc_dat$Vc*100
 nc_dat$beta.hat <- as.numeric(nc_dat$beta.hat)
 nc_dat$gamma.hat <- as.numeric(nc_dat$gamma.hat)
 nc_dat$r0.hat <- as.numeric(nc_dat$r0.hat)
-#tmap_mode("view")
+
+nc_dat$start_date <- as.Date(nc_dat$start_date)
+nc_dat$peak_date <- as.Date(nc_dat$peak_date)
 r0_map <- tm_shape(nc_dat) + 
   tm_polygons("r0.hat",
               style = 'fixed',
@@ -149,11 +152,73 @@ ggplot(nc_dat, aes(x=Population, y=r0.hat)) + geom_point()
 ggplot(nc_dat, aes(x=Population, y=immunity_pct)) + geom_point()
 
 ## r0 frame for boxplots 
-beta <- data.frame(group = "beta.hat", value = nc_dat$beta.hat)
-gamma <- data.frame(group = "gamma.hat", value = nc_dat$gamma.hat)
-r0 <- data.frame(group = "r0.hat", value = nc_dat$r0.hat)
+beta <- data.frame(group = "Beta", value = nc_dat$beta.hat)
+gamma <- data.frame(group = "Gamma", value = nc_dat$gamma.hat)
+r0 <- data.frame(group = "R0", value = nc_dat$r0.hat)
 r0_boxplot <- rbind(beta,gamma,r0)
 r0_boxplot$group <- as.factor(r0_boxplot$group)
 
-ggboxplot(r0_boxplot, x = "group", y = "value")
+ggviolin(r0_boxplot, x = "group", y = "value",
+          color = "group", palette =c("#00AFBB", "#E7B800", "#FC4E07"),
+          add = "boxplot")+
+  ggtitle("Distributions for R0 parameters for B.1.617.2 (Delta), North Carolina Counties (N = 100)")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  rremove("legend")+
+  xlab("Parameter")+ylab("Value")
 
+# ggsummarystats(
+#   r0_boxplot, x = "group", y = "value", 
+#   ggfunc = ggviolin, add = c("boxplot", "median_iqr"),
+#   color = "group", palette = c("#00AFBB", "#E7B800", "#FC4E07")
+# )
+
+### TIME SERIES IMMUNITY EST ###
+immunity_est$COUNTY <- toupper(immunity_est$COUNTY)
+names(immunity_est)[1] <- 'CO_NAME'
+immunity_ts <- merge(shp, 
+                     immunity_est, 
+                     by = "CO_NAME", 
+                     all = TRUE)
+
+# get DATES for faceting 
+dates <- c("2020-12-27", "2021-01-31", "2021-02-28", "2021-03-28", "2021-04-25")
+date_distr <- data.frame()
+for(date in dates){
+  #print(date)
+  date_dat <- immunity_ts %>%
+    filter(DATE == as.Date(date))%>%
+    select(CO_NAME, DATE, immunity_mean)
+  date_distr <- rbind(date_distr,date_dat)
+}
+
+tm_shape(date_distr)+
+  tm_polygons("immunity_mean",
+              title = "% Immune",
+              palette = 'BuGn')+
+  tm_facets(by = "DATE")
+  
+plot_dates <- as.data.frame(date_distr)[, c("DATE", "immunity_mean")]
+
+ggviolin(plot_dates, x = "DATE", y = "immunity_mean",
+         add = c("boxplot"))+
+  ggtitle("% Immune for North Carolina Counties (N = 100) from Start Vaccination to Before B.1.617.2")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  ylab("% Immune")
+
+# boxplots for start & peak dates
+start <- data.frame(group = "Start Date", dates = nc_dat$start_date)
+peak <- data.frame(group = "Peak Date", dates = nc_dat$peak_date)
+
+ggboxplot(rbind(start,peak), x = "group", y = "dates")+
+  xlab("")+
+  ylab("Month (2021)")+
+  ggtitle("Start and Peak Date Distribution for B.1.617.2 in North Carolina Counties (N=100)")+
+  rremove("legend")+
+  theme(plot.title = element_text(hjust = 0.5))
+  
+
+# ggsummarystats(
+#   plot_dates, x = "DATE", y = "immunity_mean",
+#   ggfunc = ggviolin, add = c("boxplot", "median_iqr"),
+#   color = "DATE"
+# )
