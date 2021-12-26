@@ -7,11 +7,8 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(plotly)
-library(tmap)
-library(sf)
-library(RColorBrewer)
-library(rsconnect)
 library(vtable)
+library(writexl)
 
 # import files
 immunity_est <- read_excel("exported data/immunity_est.xlsx")
@@ -76,4 +73,5 @@ ggplot(data = delta_proj, aes(week))+
   geom_line(aes(y=I),color='red') +
   facet_wrap(~COUNTY)
 
-#
+# write out file for immunity and vaccination 
+write_xlsx(immunity_vc, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_vc.xlsx')
