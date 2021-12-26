@@ -70,6 +70,10 @@ immunity_vc <- immunity_vc %>%
          vacc_date = as.Date(start_date)-14)
 
 # can we do a facet for nc counties and their projections to show fits for the delta wave?
-
+delta_proj$COUNTY <- as.factor(delta_proj$COUNTY)
+ggplot(data = delta_proj, aes(week))+
+  geom_line(aes(y=infections),color='black')+
+  geom_line(aes(y=I),color='red') +
+  facet_wrap(~COUNTY)
 
 #
