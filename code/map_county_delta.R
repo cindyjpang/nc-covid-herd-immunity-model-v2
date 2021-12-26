@@ -65,17 +65,20 @@ r0_map <- tm_shape(nc_dat) +
   tm_polygons("r0.hat",
               style = 'fixed',
               breaks = c(0,2,2.5,3.0,3.5,4.0, 100),
-              palette = 'Reds')
+              palette = 'Reds', 
+              title = "R0 estimates")
 r0_map
 
 start_date_map <- tm_shape(nc_dat) + 
   tm_polygons("start_date",
-              palette = c('#2c7fb8', '#7fcdbb', '#edf8b1'))
+              palette = c('#2c7fb8', '#7fcdbb', '#edf8b1'), 
+              title = "Start Date of B.1.617.2 Wave")
 start_date_map
 
 peak_date_map <-tm_shape(nc_dat)+
   tm_polygons("peak_date", 
-              palette = c('#e34a33', '#fdbb84', '#fee8c8'))
+              palette = c('#e34a33', '#fdbb84', '#fee8c8'), 
+              title = "Peak Date of B.1.617.2 Wave")
 peak_date_map
 
 ## slope map not super useful bc not scaled to pop'n
@@ -99,7 +102,7 @@ immunity_map <- tm_shape(nc_dat) +
   tm_polygons("immunity_pct",
               title = "% Immune",
               palette = 'BuGn')+
-  tm_layout(main.title = "NC Immunity % before Delta Wave")
+  tm_layout(main.title = "NC Immunity % before B.1.617.2 Wave")
 immunity_map
 
 
