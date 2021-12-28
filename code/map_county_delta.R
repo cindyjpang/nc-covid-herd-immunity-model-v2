@@ -140,46 +140,46 @@ r0_immunity
 # r0_start <- ggplot(nc_dat, aes(x=r0.hat, y=start_date)) + geom_point()
 # r0_start
 
-ggplotRegression <- function (fit) {
-  
-  
-  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
-    geom_point() +
-    stat_smooth(method = "lm", col = "red") +
-    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
-                       "Intercept =",signif(fit$coef[[1]],5 ),
-                       " Slope =",signif(fit$coef[[2]], 5),
-                       " P =",signif(summary(fit)$coef[2,4], 5)))
-}
-
-
-fit1 <- lm(start_peak_diff ~ immunity_pct, data = nc_dat)
-ggplotRegression(fit1)
-
-
-nc_dat$ref_date <-as.Date("2021-01-01")
-nc_dat$start_ref <- as.numeric(difftime(nc_dat$start_date, "2021-01-01"), units = "days")
-nc_dat$peak_ref <- as.numeric(difftime(nc_dat$peak_date, "2021-01-01"), units = "days")
-
-
-fit2 <- lm(start_ref ~ immunity_pct, data = nc_dat)
-ggplotRegression(fit2)
-
-fit3 <- lm(peak_ref ~ immunity_pct, data = nc_dat)
-ggplotRegression(fit3)
-
-
-fit4 <- lm(r0.hat ~ immunity_pct, data = nc_dat)
-ggplotRegression(fit4)
-
-fit5 <- lm(r0.hat ~ Population, data = nc_dat)
-ggplotRegression(fit5)
-
-fit6 <- lm(start_ref ~ r0.hat, data = nc_dat)
-ggplotRegression(fit6)
-
-fit7 <- lm(peak_ref ~ r0.hat, data = nc_dat)
-ggplotRegression(fit7)
+# ggplotRegression <- function (fit) {
+#   
+#   
+#   ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+#     geom_point() +
+#     stat_smooth(method = "lm", col = "red") +
+#     labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+#                        "Intercept =",signif(fit$coef[[1]],5 ),
+#                        " Slope =",signif(fit$coef[[2]], 5),
+#                        " P =",signif(summary(fit)$coef[2,4], 5)))
+# }
+# 
+# 
+# fit1 <- lm(start_peak_diff ~ immunity_pct, data = nc_dat)
+# ggplotRegression(fit1)
+# 
+# 
+# nc_dat$ref_date <-as.Date("2021-01-01")
+# nc_dat$start_ref <- as.numeric(difftime(nc_dat$start_date, "2021-01-01"), units = "days")
+# nc_dat$peak_ref <- as.numeric(difftime(nc_dat$peak_date, "2021-01-01"), units = "days")
+# 
+# 
+# fit2 <- lm(start_ref ~ immunity_pct, data = nc_dat)
+# ggplotRegression(fit2)
+# 
+# fit3 <- lm(peak_ref ~ immunity_pct, data = nc_dat)
+# ggplotRegression(fit3)
+# 
+# 
+# fit4 <- lm(r0.hat ~ immunity_pct, data = nc_dat)
+# ggplotRegression(fit4)
+# 
+# fit5 <- lm(r0.hat ~ Population, data = nc_dat)
+# ggplotRegression(fit5)
+# 
+# fit6 <- lm(start_ref ~ r0.hat, data = nc_dat)
+# ggplotRegression(fit6)
+# 
+# fit7 <- lm(peak_ref ~ r0.hat, data = nc_dat)
+# ggplotRegression(fit7)
 
 # ggplot(nc_dat, aes(x=immunity_pct, y=start_ref)) + geom_point()+stat_smooth(method = "lm", col = "blue")
 # 
@@ -235,6 +235,7 @@ for(date in dates){
   date_distr <- rbind(date_distr,date_dat)
 }
 
+# plot immunity over time
 tm_shape(date_distr)+
   tm_polygons("immunity_mean",
               title = "% Immune",
@@ -249,6 +250,7 @@ ggviolin(plot_dates, x = "DATE", y = "immunity_mean",
   theme(plot.title = element_text(hjust = 0.5))+
   ylab("% Immune")
 
+
 # boxplots for start & peak dates
 start <- data.frame(group = "Start Date", dates = nc_dat$start_date)
 peak <- data.frame(group = "Peak Date", dates = nc_dat$peak_date)
@@ -259,6 +261,19 @@ ggboxplot(rbind(start,peak), x = "group", y = "dates")+
   ggtitle("Start and Peak Date Distribution for B.1.617.2 in North Carolina Counties (N=100)")+
   rremove("legend")+
   theme(plot.title = element_text(hjust = 0.5))
+
+library(plyr)
+mu <- ddply(rbind(start,peak), "group", summarise, grp.mean=mean(dates))
+head(mu)
+ggplot(rbind(start,peak), aes(x=dates, fill=group))+
+  geom_density(alpha=0.2)+
+  geom_vline(data=mu, aes(xintercept=grp.mean, color=group),
+             linetype='dashed')+
+  xlab("Month")+
+  ylab("Density")+
+  ggtitle("Start and Peak Date Distribution for B.1.617.2 in North Carolina Counties (N=100)")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(legend.title = element_blank())
   
 
 # ggsummarystats(
