@@ -68,6 +68,8 @@ immunity_vc <- immunity_vc %>%
 
 # can we do a facet for nc counties and their projections to show fits for the delta wave? YES!
 delta_proj$COUNTY <- as.factor(delta_proj$COUNTY)
+delta_proj <- delta_proj %>%
+  mutate(N = S+I+R)
 ggplot(data = delta_proj, aes(week))+
   geom_line(aes(y=infections),color='black')+
   geom_line(aes(y=I),color='red') +

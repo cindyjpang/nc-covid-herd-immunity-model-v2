@@ -137,22 +137,63 @@ r0_immunity
 ## higher immunity, higher r0.hat
 
 # r0 vs start date 
-r0_start <- ggplot(nc_dat, aes(x=r0.hat, y=start_date)) + geom_point()
-r0_start
+# r0_start <- ggplot(nc_dat, aes(x=r0.hat, y=start_date)) + geom_point()
+# r0_start
 
-ggplot(nc_dat, aes(x=immunity_pct, y=start_date)) + geom_point()
+ggplotRegression <- function (fit) {
+  
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
 
-ggplot(nc_dat, aes(x=r0.hat, y=peak_date)) + geom_point()
 
-ggplot(nc_dat, aes(x=immunity_pct, y=peak_date)) + geom_point()
+fit1 <- lm(start_peak_diff ~ immunity_pct, data = nc_dat)
+ggplotRegression(fit1)
 
-ggplot(nc_dat, aes(x=immunity_pct, y=start_peak_diff)) + geom_point()
 
-ggplot(nc_dat, aes(x=r0.hat, y=start_peak_diff)) + geom_point()
+nc_dat$ref_date <-as.Date("2021-01-01")
+nc_dat$start_ref <- as.numeric(difftime(nc_dat$start_date, "2021-01-01"), units = "days")
+nc_dat$peak_ref <- as.numeric(difftime(nc_dat$peak_date, "2021-01-01"), units = "days")
 
-ggplot(nc_dat, aes(x=Population, y=r0.hat)) + geom_point()
 
-ggplot(nc_dat, aes(x=Population, y=immunity_pct)) + geom_point()
+fit2 <- lm(start_ref ~ immunity_pct, data = nc_dat)
+ggplotRegression(fit2)
+
+fit3 <- lm(peak_ref ~ immunity_pct, data = nc_dat)
+ggplotRegression(fit3)
+
+
+fit4 <- lm(r0.hat ~ immunity_pct, data = nc_dat)
+ggplotRegression(fit4)
+
+fit5 <- lm(r0.hat ~ Population, data = nc_dat)
+ggplotRegression(fit5)
+
+fit6 <- lm(start_ref ~ r0.hat, data = nc_dat)
+ggplotRegression(fit6)
+
+fit7 <- lm(peak_ref ~ r0.hat, data = nc_dat)
+ggplotRegression(fit7)
+
+# ggplot(nc_dat, aes(x=immunity_pct, y=start_ref)) + geom_point()+stat_smooth(method = "lm", col = "blue")
+# 
+# #ggplot(nc_dat, aes(x=r0.hat, y=peak_date)) + geom_point()
+# 
+# ggplot(nc_dat, aes(x=immunity_pct, y=peak_date)) + geom_point()
+# 
+# ggplot(nc_dat, aes(x=immunity_pct, y=start_peak_diff)) + geom_point()
+# 
+# ggplot(nc_dat, aes(x=r0.hat, y=start_peak_diff)) + geom_point()
+# 
+# ggplot(nc_dat, aes(x=Population, y=r0.hat)) + geom_point()
+# 
+# ggplot(nc_dat, aes(x=Population, y=immunity_pct)) + geom_point()
 
 ## r0 frame for boxplots 
 beta <- data.frame(group = "Beta", value = nc_dat$beta.hat)

@@ -35,7 +35,7 @@ case_dat <- cbind(case_dat[, c('DATE', 'COUNTY')], lapply(case_dat[, -c(1,2)], a
 
 # calculated reported cases and multiplier 
 case_dat$total_reported_cases <- rowSums(case_dat[, c('Cases0_17', 'Cases18_24', 'Cases25_49', 'Cases50_64', 'Cases65_74', 'Cases75_', 'Supr_Cases', 'Miss_Cases')], na.rm = TRUE)
-case_dat$cdc_multiplier <- case_dat$total_reported_cases*4.3
+case_dat$cdc_multiplier <- case_dat$total_reported_cases*4.0
 
 ###################################################################### death-infection estimates
 death_dat <- case_dat[, c('DATE', 'COUNTY', 'Deaths0_17', 'Deaths18_24', 'Deaths25_49', 'Deaths50_64', 'Deaths65_74', 'Deaths75_', 'Supr_Deaths', 'Miss_Deaths')]
