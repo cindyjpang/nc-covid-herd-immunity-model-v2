@@ -71,8 +71,14 @@ delta_proj$COUNTY <- as.factor(delta_proj$COUNTY)
 delta_proj <- delta_proj %>%
   mutate(N = S+I+R)
 ggplot(data = delta_proj, aes(week))+
-  geom_line(aes(y=infections),color='black')+
-  geom_line(aes(y=I),color='red') +
+  geom_line(aes(y=infections/N, color="Observed Infections"))+
+  geom_line(aes(y=I/N, color="Fitted Infections SSE")) +
+  scale_color_manual("",
+                     breaks = c("Observed Infections", "Fitted Infections SSE"),
+                     values = c("Observed Infections" = "black", "Fitted Infections SSE" = "red"))+
+  xlab("Week")+
+  ylab("Case Rate (Infections per Person)")+
+  ggtitle("Fitted Infections SSE against Observed Infections for NC Counties (N=100) during B.1.617.2 Wave")+
   facet_wrap(~COUNTY)
 
 # write out file for immunity and vaccination 
