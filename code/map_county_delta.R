@@ -77,7 +77,7 @@ start_date_map <- tm_shape(nc_dat) +
               style = "cont",
               title = "Start Date")+
   tm_layout(main.title = "Start Date of B.1.617.2 Wave",
-            main.title.position = c("center", "top"), 
+            main.title.position = c("left", "top"), 
             legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
