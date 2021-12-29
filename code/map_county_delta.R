@@ -144,7 +144,14 @@ immunity_map <- tm_shape(nc_dat) +
                text.size = 0.8)
 tmap_save(immunity_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_ImmunityPrior_Map.png")
   
+## histogram for immunity prior to delta 
+ggplot(nc_dat, aes(x=immunity_pct))+
+  geom_histogram(alpha = 0.3, color = "black")+
+  labs(title="Immunity % Prior to B.1.617.2",x="% Immune", y = "Count", subtitle = "NC Counties (N=100)")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
 
+#ggsave(plot=pct_diff, filename = "B.1.617.2_ImmunityPct_Hist.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 hit_map <- tm_shape(nc_dat) + 
   tm_polygons("hit_pct",
@@ -173,21 +180,30 @@ pct_diff <- ggplot(nc_dat, aes(x=pct_discrepency))+
   labs(title="Percent Difference = HIT (%) - % Immune at Start ",x="% Difference", y = "Count", subtitle = "NC Counties (N=100)")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+
 ggsave(plot=pct_diff, filename = "B.1.617.2_PctDiff_Hist.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 need_vaccination <- tm_shape(nc_dat) + 
   tm_polygons("need_vaccination",
               title = "Number of People Needed to Vaccinate",
               palette = 'BuPu')+
-  tm_layout(main.title = "Number Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT")
-need_vaccination
+  tm_layout(main.title = "Number Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT",
+            main.title.position = c("left", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(need_vaccination, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_NNV_Map.png")
+
 # histogram of need vaccination - skew 
-ggplot(nc_dat, aes(x=need_vaccination))+
+nnv_hist <- ggplot(nc_dat, aes(x=need_vaccination))+
   geom_histogram(alpha = 0.3, color = "black")+
   labs(title="Number of People Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT ",x="Number of People Needed to Vaccinate", y = "Count", subtitle = "NC Counties (N=100)")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
-  
+ggsave(plot=nnv_hist, filename = "B.1.617.2_NNV_Hist.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
 
 
 
@@ -198,13 +214,15 @@ r0 <- data.frame(group = "R0", value = nc_dat$r0.hat)
 r0_boxplot <- rbind(beta,gamma,r0)
 r0_boxplot$group <- as.factor(r0_boxplot$group)
 
-ggviolin(r0_boxplot, x = "group", y = "value",
+r0_bp <- ggviolin(r0_boxplot, x = "group", y = "value",
           color = "group", palette =c("#00AFBB", "#E7B800", "#FC4E07"),
           add = "boxplot")+
   ggtitle("Distributions for R0 parameters for B.1.617.2 (Delta), North Carolina Counties (N = 100)")+
   theme(plot.title = element_text(hjust = 0.5))+
   rremove("legend")+
   xlab("Parameter")+ylab("Value")
+ggsave(plot=r0_bp, filename = "B.1.617.2_R0_Params_vPlot.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
 
 ## get summary statistics for r0 parameters 
 r0_boxplot$group <- as.factor(r0_boxplot$group)
@@ -238,19 +256,27 @@ for(date in dates){
 }
 
 # plot immunity over time
-tm_shape(date_distr)+
+immunity_ts <- tm_shape(date_distr)+
   tm_polygons("immunity_mean",
               title = "% Immune",
               palette = 'BuGn')+
-  tm_facets(by = "DATE")
-  
-plot_dates <- as.data.frame(date_distr)[, c("DATE", "immunity_mean")]
+  tm_facets(by = "DATE")+
+  tm_layout(main.title = "% Immune Prior to B.1.617.2",
+            main.title.position = c("left", "top"), 
+            main.title.size = 1.5)
+tmap_save(immunity_ts, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_Immunity_TS_Map.png")
 
-ggviolin(plot_dates, x = "DATE", y = "immunity_mean",
+plot_dates <- as.data.frame(date_distr)[, c("DATE", "immunity_mean")]
+plot_dates$DATE <- as.character(plot_dates$DATE) #makes appending easier
+prior_delta <- data.frame(DATE = "Start_Delta*", immunity_mean = nc_dat$immunity_pct)
+plot_dates <- rbind(plot_dates, prior_delta)
+immunity_ts_vplot <- ggviolin(plot_dates, x = "DATE", y = "immunity_mean",
          add = c("boxplot"))+
   ggtitle("% Immune for North Carolina Counties (N = 100) from Start Vaccination to Before B.1.617.2")+
   theme(plot.title = element_text(hjust = 0.5))+
-  ylab("% Immune")
+  ylab("% Immune")+
+  labs(caption = "*dates range from 2021-05-09 to 2021-07-04")
+ggsave(plot=immunity_ts_vplot, filename = "B.1.617.2_Immunity_TS_vPlot.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 # get summary data
 plot_dates$DATE <- as.factor(plot_dates$DATE)
@@ -272,15 +298,16 @@ library(plyr)
 mu <- ddply(rbind(start,peak), "group", summarise, grp.mean=mean(dates))
 head(mu)
 
-ggplot(rbind(start,peak), aes(x=dates, fill=group))+
+start_peak_plot <-ggplot(rbind(start,peak), aes(x=dates, fill=group))+
   geom_density(alpha=0.2)+
   geom_vline(data=mu, aes(xintercept=grp.mean, color=group),
              linetype='dashed')+
+  geom_text(data = mu, aes(x=grp.mean, label = as.character(grp.mean), y=0.01), color = c('red', 'blue'))+
   xlab("Month")+
   ylab("Density")+
   ggtitle("Start and Peak Date Distribution for B.1.617.2 in North Carolina Counties (N=100)")+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(legend.title = element_blank())
-  
+ggsave(plot=start_peak_plot, filename = "B.1.617.2_StartPeak_dPlot.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 
