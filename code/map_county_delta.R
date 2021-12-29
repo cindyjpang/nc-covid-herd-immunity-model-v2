@@ -168,11 +168,12 @@ pct_disc <- tm_shape(nc_dat) +
 pct_disc
 
 # make histogram of percent differences and compare with the histogram of need vaccination - symmetric
-ggplot(nc_dat, aes(x=pct_discrepency))+
+pct_diff <- ggplot(nc_dat, aes(x=pct_discrepency))+
   geom_histogram(alpha = 0.3, color = "black")+
   labs(title="Percent Difference = HIT (%) - % Immune at Start ",x="% Difference", y = "Count", subtitle = "NC Counties (N=100)")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+ggsave(plot=pct_diff, filename = "B.1.617.2_PctDiff_Hist", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images")
 
 need_vaccination <- tm_shape(nc_dat) + 
   tm_polygons("need_vaccination",
