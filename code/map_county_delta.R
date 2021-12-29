@@ -173,7 +173,7 @@ pct_diff <- ggplot(nc_dat, aes(x=pct_discrepency))+
   labs(title="Percent Difference = HIT (%) - % Immune at Start ",x="% Difference", y = "Count", subtitle = "NC Counties (N=100)")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
-ggsave(plot=pct_diff, filename = "B.1.617.2_PctDiff_Hist", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images")
+ggsave(plot=pct_diff, filename = "B.1.617.2_PctDiff_Hist.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 need_vaccination <- tm_shape(nc_dat) + 
   tm_polygons("need_vaccination",
