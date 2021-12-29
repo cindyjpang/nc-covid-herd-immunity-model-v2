@@ -61,24 +61,36 @@ nc_dat$r0.hat <- as.numeric(nc_dat$r0.hat)
 
 nc_dat$start_date <- as.Date(nc_dat$start_date)
 nc_dat$peak_date <- as.Date(nc_dat$peak_date)
+
 r0_map <- tm_shape(nc_dat) + 
   tm_polygons("r0.hat",
               style = 'fixed',
               breaks = c(0,2,2.5,3.0,3.5,4.0, 100),
               palette = 'Reds', 
-              title = "R0 estimates")
+              title = "R0 estimates")+
+  title = "R0 Estimates of B.1.617.2 Wave"
 r0_map
 
 start_date_map <- tm_shape(nc_dat) + 
   tm_polygons("start_date",
               palette = c('#2c7fb8', '#7fcdbb', '#edf8b1'), 
-              title = "Start Date of B.1.617.2 Wave")
+              style = "cont",
+              title = "Start Date")+
+  tm_layout(main.title = "Start Date of B.1.617.2 Wave",
+            main.title.position = c("center", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+
 start_date_map
 
 peak_date_map <-tm_shape(nc_dat)+
   tm_polygons("peak_date", 
               palette = c('#e34a33', '#fdbb84', '#fee8c8'), 
-              title = "Peak Date of B.1.617.2 Wave")
+              title = "Peak Date")+
+  tm_layout(title = "Peak Date of B.1.617.2 Wave")
 peak_date_map
 
 ## slope map not super useful bc not scaled to pop'n
@@ -117,7 +129,8 @@ hit_map
 pct_disc <- tm_shape(nc_dat) + 
   tm_polygons("pct_discrepency",
               title = "Percent Difference: HIT (%) - % Immune at Start",
-              palette = 'Greys')
+              palette = 'Greys')+
+  tm_layout(title = "Percent Difference: HIT (%) - % Immune at Start")
 pct_disc
 need_vaccination <- tm_shape(nc_dat) + 
   tm_polygons("need_vaccination",
