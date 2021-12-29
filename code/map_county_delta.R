@@ -68,8 +68,15 @@ r0_map <- tm_shape(nc_dat) +
               breaks = c(0,2,2.5,3.0,3.5,4.0, 100),
               palette = 'Reds', 
               title = "R0 estimates")+
-  title = "R0 Estimates of B.1.617.2 Wave"
-r0_map
+  tm_layout(main.title = "R0 estimates of B.1.617.2 Wave",
+            main.title.position = c("left", "top"), 
+            main.title.size = 1.15,
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(r0_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_R0_Map.png")
 
 start_date_map <- tm_shape(nc_dat) + 
   tm_polygons("start_date",
@@ -84,14 +91,20 @@ start_date_map <- tm_shape(nc_dat) +
                position = c("left", "bottom"),
                text.size = 0.8)
 
-start_date_map
+tmap_save(start_date_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_StartDate_Map.png")
 
 peak_date_map <-tm_shape(nc_dat)+
   tm_polygons("peak_date", 
               palette = c('#e34a33', '#fdbb84', '#fee8c8'), 
               title = "Peak Date")+
-  tm_layout(title = "Peak Date of B.1.617.2 Wave")
-peak_date_map
+  tm_layout(main.title = "Peak Date of B.1.617.2 Wave",
+            main.title.position = c("left", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(peak_date_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_PeakDate_Map.png")
 
 ## slope map not super useful bc not scaled to pop'n
 # slope_map <- tm_shape(nc_dat)+
@@ -107,24 +120,45 @@ time_to_peak <- tm_shape(nc_dat)+
               style = 'fixed',
               breaks = c(0,60,70,80,90,130),
               palette = c("#3182bd", "#9ecae1", "#deebf7"),
-              title = "Time to Peak (days)") #darker colors = shorter time to peak
-time_to_peak
+              title = "Time to Peak (days)")+
+  tm_layout(main.title = "Time to Peak of B.1.617.2 Wave",
+            main.title.position = c("left", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(time_to_peak, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_TimeToPeak_Map.png")
+
 
 immunity_map <- tm_shape(nc_dat) + 
   tm_polygons("immunity_pct",
               title = "% Immune",
               palette = 'PuBuGn')+
-  tm_layout(main.title = "NC Immunity % before B.1.617.2 Wave")
-immunity_map
+  tm_layout(main.title = "NC Immunity % before B.1.617.2 Wave",
+            main.title.position = c("left", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(immunity_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_ImmunityPrior_Map.png")
+  
 
 
 hit_map <- tm_shape(nc_dat) + 
   tm_polygons("hit_pct",
               title = "Herd Immunity Threshold (HIT) %",
               palette = 'BuPu')+
-  tm_layout(main.title = "Herd Immunity Threshold (HIT) for Counties in NC for B.1.617.2")
+  tm_layout(main.title = "Herd Immunity Threshold (HIT) for Counties in NC for B.1.617.2",
+            main.title.position = c("left", "top"), 
+            legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+tmap_save(hit_map, filename = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_HIT_Map.png")
 
-hit_map
 
 pct_disc <- tm_shape(nc_dat) + 
   tm_polygons("pct_discrepency",
@@ -132,12 +166,27 @@ pct_disc <- tm_shape(nc_dat) +
               palette = 'Greys')+
   tm_layout(title = "Percent Difference: HIT (%) - % Immune at Start")
 pct_disc
+
+# make histogram of percent differences and compare with the histogram of need vaccination - symmetric
+ggplot(nc_dat, aes(x=pct_discrepency))+
+  geom_histogram(alpha = 0.3, color = "black")+
+  labs(title="Percent Difference = HIT (%) - % Immune at Start ",x="% Difference", y = "Count", subtitle = "NC Counties (N=100)")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+
 need_vaccination <- tm_shape(nc_dat) + 
   tm_polygons("need_vaccination",
               title = "Number of People Needed to Vaccinate",
               palette = 'BuPu')+
   tm_layout(main.title = "Number Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT")
 need_vaccination
+# histogram of need vaccination - skew 
+ggplot(nc_dat, aes(x=need_vaccination))+
+  geom_histogram(alpha = 0.3, color = "black")+
+  labs(title="Number of People Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT ",x="Number of People Needed to Vaccinate", y = "Count", subtitle = "NC Counties (N=100)")+
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+  
 
 
 
