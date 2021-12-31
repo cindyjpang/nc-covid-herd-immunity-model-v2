@@ -70,7 +70,7 @@ immunity_vc <- immunity_vc %>%
 delta_proj$COUNTY <- as.factor(delta_proj$COUNTY)
 delta_proj <- delta_proj %>%
   mutate(N = S+I+R)
-ggplot(data = delta_proj, aes(week))+
+p <- ggplot(data = delta_proj, aes(week))+
   geom_line(aes(y=infections/N, color="Observed Infections"))+
   geom_line(aes(y=I/N, color="Fitted Infections SSE")) +
   scale_color_manual("",
@@ -80,6 +80,7 @@ ggplot(data = delta_proj, aes(week))+
   ylab("Case Rate (Infections per Person)")+
   ggtitle("Fitted Infections SSE against Observed Infections for NC Counties (N=100) during B.1.617.2 Wave")+
   facet_wrap(~COUNTY)
+ggsave(plot=p, filename = "B.1.617.2_R0_Fit.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 # write out file for immunity and vaccination 
 write_xlsx(immunity_vc, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_vc.xlsx')

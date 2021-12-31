@@ -284,7 +284,7 @@ immunity_ts_summary <- plot_dates %>%
   group_by(DATE) %>%
   summarise(
     mean = mean(immunity_mean),
-    sd = mean(immunity_mean),
+    sd = sd(immunity_mean),
     median = median(immunity_mean),
     iqr = IQR(immunity_mean)
   )
