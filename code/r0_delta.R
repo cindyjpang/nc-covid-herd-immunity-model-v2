@@ -27,18 +27,18 @@ gamma.hat <- delta_summary$gamma.hat
 r0.hat <- delta_summary$r0.hat
 
 # histograms for R0 params
-par(mfrow = c(4,1))
-hist(beta.hat, xlab = expression(beta), main = "")
-hist(delta_summary$gamma.hat, xlab = expression(gamma), main = "")
-hist(delta_summary$recovery_time, xlab = "Recovery Time (days)", main = "")
-hist(delta_summary$r0.hat, xlab = "R0", main = "")
-
-# boxplots
-par(mfrow = c(4,1))
-boxplot(beta.hat, horizontal = TRUE, xlab = expression(beta))
-boxplot(gamma.hat, horizontal = TRUE, xlab = expression(gamma))
-boxplot(delta_summary$recovery_time, horizontal = TRUE, xlab = "Recovery Time (days)")
-boxplot(r0.hat, horizontal = TRUE, xlab = "R0")
+# par(mfrow = c(4,1))
+# hist(beta.hat, xlab = expression(beta), main = "")
+# hist(delta_summary$gamma.hat, xlab = expression(gamma), main = "")
+# hist(delta_summary$recovery_time, xlab = "Recovery Time (days)", main = "")
+# hist(delta_summary$r0.hat, xlab = "R0", main = "")
+# 
+# # boxplots
+# par(mfrow = c(4,1))
+# boxplot(beta.hat, horizontal = TRUE, xlab = expression(beta))
+# boxplot(gamma.hat, horizontal = TRUE, xlab = expression(gamma))
+# boxplot(delta_summary$recovery_time, horizontal = TRUE, xlab = "Recovery Time (days)")
+# boxplot(r0.hat, horizontal = TRUE, xlab = "R0")
 
 # summary tables 
 sumtable(delta_summary, vars = c('beta.hat', 'gamma.hat', 'r0.hat', 'recovery_time'), labels = c("Beta","Gamma","R0","Recovery Times (days)" ))
