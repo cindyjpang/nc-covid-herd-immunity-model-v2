@@ -211,10 +211,13 @@ ggsave(plot=nnv_hist, filename = "B.1.617.2_NNV_Hist.png", path = "C:\\Users\\ci
 beta <- data.frame(group = "Beta", value = nc_dat$beta.hat)
 gamma <- data.frame(group = "Gamma", value = nc_dat$gamma.hat)
 r0 <- data.frame(group = "R0", value = nc_dat$r0.hat)
-r0_boxplot <- rbind(beta,gamma,r0)
+hit <- data.frame(group = "HIT", value = 1-1/nc_dat$r0.hat)
+recovery_time <- data.frame(group = "Recovery Time", value = (1/nc_dat$gamma.hat)*7)
+r0_boxplot_ab <- rbind(beta, gamma, r0)
+r0_boxplot <- rbind(beta,gamma,r0, hit, recovery_time)
 r0_boxplot$group <- as.factor(r0_boxplot$group)
 
-r0_bp <- ggviolin(r0_boxplot, x = "group", y = "value",
+r0_bp <- ggviolin(r0_boxplot_ab, x = "group", y = "value",
           color = "group", palette =c("#00AFBB", "#E7B800", "#FC4E07"),
           add = "boxplot")+
   ggtitle("Distributions for R0 parameters for B.1.617.2 (Delta), North Carolina Counties (N = 100)")+
@@ -230,7 +233,7 @@ r0_summary <- r0_boxplot %>%
   group_by(group) %>%
   summarise(
     mean = mean(value),
-    sd = mean(value),
+    sd = sd(value),
     median = median(value),
     iqr = IQR(value)
   )
@@ -310,4 +313,32 @@ start_peak_plot <-ggplot(rbind(start,peak), aes(x=dates, fill=group))+
   theme(legend.title = element_blank())
 ggsave(plot=start_peak_plot, filename = "B.1.617.2_StartPeak_dPlot.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
+### CASE RATE Analysis 
+nc_dat <- nc_dat %>%
+  mutate(case_rate_to_peak = infection_change/Population)
 
+# plot case rate to peak against immunity_pct 
+ggplot(nc_dat, aes(x = immunity_pct, y = case_rate_to_peak)) + geom_point()
+model <- lm(case_rate_to_peak ~ immunity_pct, data = nc_dat)
+summary(model)
+## results: R^2_Adjusted = -0.006113, p-value = 0.5293, VERY BAD FIT
+delta_proj <- read_excel("exported data\\delta_proj.xlsx")
+cum_sum_df <- delta_proj %>% 
+  group_by(COUNTY)%>%
+  mutate(cum_sum = cumsum(infections))%>%
+  filter(DATE == max(DATE))
+cum_sum_df$COUNTY <- toupper(cum_sum_df$COUNTY)
+nc_dat <- merge(nc_dat,
+                cum_sum_df[, c("COUNTY", "cum_sum")],
+                by.x = c("CO_NAME"),
+                by.y = c("COUNTY"),
+                all = TRUE)
+nc_dat$cum_case_rate <- nc_dat$cum_sum/nc_dat$Population
+ggplot(nc_dat, aes(x = immunity_pct, y = cum_case_rate)) + geom_point()
+model2 <- lm(cum_case_rate ~ immunity_pct, data = nc_dat)
+summary(model2)
+
+hist(nc_dat$Population)
+
+ggplot(nc_dat, aes(x=Population, y=need_vaccination))+geom_point()
+ggplot(nc_dat, aes(x=Population, y=need_vaccination))+geom_point()
