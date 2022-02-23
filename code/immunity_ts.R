@@ -12,8 +12,8 @@ library(readxl)
 library(RColorBrewer)
 library(tidyverse)
 library(rsconnect)
-shp <- st_read("C:\\Users\\cindy\\nc-covid-herd-immunity-model\\data\\nc shapefile\\counties.shp")
-dat <- read_excel("C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\immunity_est.xlsx")
+shp <- st_read("C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\data\\nc shapefile\\counties.shp")
+dat <- read_excel("C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_est.xlsx")
 
 
 ## change and merge data

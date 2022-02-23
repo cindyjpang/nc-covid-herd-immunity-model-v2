@@ -5,7 +5,7 @@
 ###
 ### Written by: Cindy Pang
 
-setwd("C:/Users/cindy/nc-covid-herd-immunity-model-v2")
+setwd("C:/Users/Cindy Pang/nc-covid-herd-immunity-model-v2")
 # import packages
 library(readr)
 library(readxl)
@@ -122,7 +122,7 @@ death_dat$cum_death_inf_est <- ave(death_dat$death_est_total_inf, death_dat$COUN
 
 
 # write out files 
-write_xlsx(case_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\reported_case_inf_est.xlsx')
-write_xlsx(death_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\death_inf_est.xlsx')
+write_xlsx(case_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\reported_case_inf_est.xlsx')
+write_xlsx(death_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\death_inf_est.xlsx')
 
 

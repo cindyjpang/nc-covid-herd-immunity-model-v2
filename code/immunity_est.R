@@ -101,5 +101,5 @@ immunity_dat$immunity_mean = rowMeans(immunity_dat[,c(
 
 
 # write out to excel file 
-write_xlsx(immunity_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\immunity_est.xlsx')
+write_xlsx(immunity_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_est.xlsx')
 
