@@ -61,4 +61,4 @@ for(county in unique(sir_model$COUNTY)){
 }
 sir_model <- subset(sir_model, COUNTY != 'Missing')
 # write out excel files with SIR Initial Conditions Time-Series 
-write_xlsx(sir_model, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\sir_model_ts_initial_conditions.xlsx')
+write_xlsx(sir_model, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sir_model_ts_initial_conditions.xlsx')

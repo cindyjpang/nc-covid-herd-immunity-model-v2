@@ -1,5 +1,5 @@
 ## r0 analysis 
-setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2")
+setwd("C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2")
 
 # libraries lets go!!!
 library(readxl)
@@ -20,7 +20,7 @@ county_pop <- read_excel("data/census2020_county_pop.xlsx")
 delta_summary$beta.hat <- as.numeric(delta_summary$beta.hat)
 delta_summary$gamma.hat <- as.numeric(delta_summary$gamma.hat)
 delta_summary$r0.hat <- as.numeric(delta_summary$r0.hat)
-delta_summary$recovery_time <- (1/gamma.hat)*7
+delta_summary$recovery_time <- (1/delta_summary$gamma.hat)*7
 delta_summary$Vc <- 1-(1/delta_summary$r0.hat)
 beta.hat <- delta_summary$beta.hat
 gamma.hat <- delta_summary$gamma.hat
@@ -80,7 +80,7 @@ p <- ggplot(data = delta_proj, aes(week))+
   ylab("Case Rate (Infections per Person)")+
   ggtitle("Fitted Infections SSE against Observed Infections for NC Counties (N=100) during B.1.617.2 Wave")+
   facet_wrap(~COUNTY)
-ggsave(plot=p, filename = "B.1.617.2_R0_Fit.png", path = "C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+ggsave(plot=p, filename = "B.1.617.2_R0_Fit.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 # write out file for immunity and vaccination 
-write_xlsx(immunity_vc, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_vc.xlsx')
+write_xlsx(immunity_vc, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_vc.xlsx')

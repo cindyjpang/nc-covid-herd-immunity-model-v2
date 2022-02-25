@@ -89,7 +89,6 @@ immunity_dat <- mutate(
   death_inf_vacc_obs_imm = (cum_death_inf_cases + cum_vacc_est_obs - joint_death_inf_obs)*100/Population,
   
   ## pure infections daily count, no joint probabilities
-  
 )
 immunity_dat$immunity_mean = rowMeans(immunity_dat[,c(
   'cdc_case_vacc_t_imm',
@@ -97,6 +96,18 @@ immunity_dat$immunity_mean = rowMeans(immunity_dat[,c(
   'death_inf_vacc_t_imm',
   'death_inf_vacc_obs_imm'
 )])
+
+## pure infections daily count, no joint probabilities
+immunity_dat$immunity_by_inf = rowMeans(immunity_dat[, c(
+  'cum_cdc_multiplier_cases',
+  'cum_death_inf_cases'
+)])*100/immunity_dat$Population
+
+# pure vaccinations, no joint probabilities 
+immunity_dat$immunity_by_vacc = rowMeans(immunity_dat[, c(
+  'cum_vacc_est_t',
+  'cum_vacc_est_obs'
+)])*100/immunity_dat$Population
 
 
 

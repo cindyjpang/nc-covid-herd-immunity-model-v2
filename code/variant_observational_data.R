@@ -16,7 +16,7 @@
 ## Methods: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7570398/
 ## ---------------------------
 
-setwd("C:\\Users\\cindy\\nc-covid-herd-immunity-model")
+setwd("C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2")
 library(readxl)
 library(tidyverse)
 library(dplyr)
@@ -103,7 +103,7 @@ for(county in counties){
   delta_end <- filter(delta_dates, COUNTY == county)$delta_end
   if(no_omicron == FALSE){ ## omicron variant present
     df_delta <-  nc_dat %>%
-      filter(COUNTY == county & between(DATE, delta_start, delta_end, incbounds = TRUE)) %>%
+      filter(COUNTY == county & DATE >= delta_start & DATE<=delta_end) %>%
       select(COUNTY, DATE,N, I, R, S)
     df_omicron <- nc_dat %>%
       filter(COUNTY == county & DATE >= delta_end) %>%
@@ -125,5 +125,5 @@ for(county in counties){
 }
 
 ## write out observational data for fitting 
-write_xlsx(delta_obs_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\delta_obs_dat.xlsx')
-write_xlsx(omicron_obs_dat, 'C:\\Users\\cindy\\nc-covid-herd-immunity-model\\exported data\\omicron_obs_dat.xlsx')
+write_xlsx(delta_obs_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\delta_obs_dat.xlsx')
+write_xlsx(omicron_obs_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\omicron_obs_dat.xlsx')
