@@ -298,6 +298,28 @@ immunity_ts_summary <- plot_dates %>%
 immunity_ts_summary
 
 
+## re-clean data for component mapping 
+immunity_components <- merge(nc_dat, 
+                             immunity_est[, c('CO_NAME', 'DATE', 'immunity_by_inf', 'immunity_by_vacc')], 
+                             by.x = c('CO_NAME', 'start_date'),
+                             by.y = c('CO_NAME', 'DATE'), 
+                             all = FALSE
+                             )
+# sanity check: immunity_components
+## immunity by infection map 
+immunity_inf_map <- tm_shape(immunity_components) + 
+  tm_polygons("immunity_by_inf",
+              title = "% Population Immune by Infection",
+              palette = 'BuPu')+
+  tm_layout(legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+immunity_inf_map
+#tmap_save(hit_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_HIT_Map.png")
+
+
 # boxplots for start & peak dates
 start <- data.frame(group = "Start Date", dates = nc_dat$start_date)
 peak <- data.frame(group = "Peak Date", dates = nc_dat$peak_date)
