@@ -310,14 +310,26 @@ immunity_components <- merge(nc_dat,
 immunity_inf_map <- tm_shape(immunity_components) + 
   tm_polygons("immunity_by_inf",
               title = "% Population Immune by Infection",
-              palette = 'BuPu')+
+              palette = 'RdPu')+
   tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
                text.size = 0.8)
-immunity_inf_map
-#tmap_save(hit_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_HIT_Map.png")
+
+tmap_save(immunity_inf_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_immunity_inf_map.png")
+
+immunity_vacc_map <- tm_shape(immunity_components) + 
+  tm_polygons("immunity_by_vacc",
+              title = "% Population Immune by Vaccination",
+              palette = 'YlGn')+
+  tm_layout(legend.outside = TRUE,
+            frame = FALSE)+
+  tm_scale_bar(color.dark = "gray60", 
+               position = c("left", "bottom"),
+               text.size = 0.8)
+immunity_vacc_map
+tmap_save(immunity_vacc_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_immunity_vacc_map.png")
 
 
 # boxplots for start & peak dates
