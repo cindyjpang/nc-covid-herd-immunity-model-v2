@@ -2,7 +2,7 @@
 ##
 ## Script name: map_county_delta
 ##
-## Purpose of script: mapping delta wave by county, produce maps for figures in manuscript
+## Purpose of script: mapping delta wave by county, produce maps for figures/tables/etc in manuscript
 ##
 ## Author: Cindy Pang
 ##
@@ -11,7 +11,7 @@
 ## Email: pangcind@live.unc.edu
 ##
 ## ---------------------------
-##    
+##    this is spaghetti code, but it is what it is! 
 ##
 ## ---------------------------
 
@@ -68,10 +68,7 @@ r0_map <- tm_shape(nc_dat) +
               breaks = c(0,2,2.5,3.0,3.5,4.0, 100),
               palette = 'Reds', 
               title = "R0 estimates")+
-  tm_layout(main.title = "R0 estimates of B.1.617.2 Wave",
-            main.title.position = c("left", "top"), 
-            main.title.size = 1.15,
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -83,9 +80,7 @@ start_date_map <- tm_shape(nc_dat) +
               palette = c('#2c7fb8', '#7fcdbb', '#edf8b1'), 
               style = "cont",
               title = "Start Date")+
-  tm_layout(main.title = "Start Date of B.1.617.2 Wave",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -97,9 +92,7 @@ peak_date_map <-tm_shape(nc_dat)+
   tm_polygons("peak_date", 
               palette = c('#e34a33', '#fdbb84', '#fee8c8'), 
               title = "Peak Date")+
-  tm_layout(main.title = "Peak Date of B.1.617.2 Wave",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -121,9 +114,7 @@ time_to_peak <- tm_shape(nc_dat)+
               breaks = c(0,60,70,80,90,130),
               palette = c("#3182bd", "#9ecae1", "#deebf7"),
               title = "Time to Peak (days)")+
-  tm_layout(main.title = "Time to Peak of B.1.617.2 Wave",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -135,9 +126,7 @@ immunity_map <- tm_shape(nc_dat) +
   tm_polygons("immunity_pct",
               title = "% Immune",
               palette = 'PuBuGn')+
-  tm_layout(main.title = "NC Immunity % before B.1.617.2 Wave",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -147,7 +136,7 @@ tmap_save(immunity_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunit
 ## histogram for immunity prior to delta 
 ggplot(nc_dat, aes(x=immunity_pct))+
   geom_histogram(alpha = 0.3, color = "black")+
-  labs(title="Immunity % Prior to B.1.617.2",x="% Immune", y = "Count", subtitle = "NC Counties (N=100)")+
+  labs(x="% Immune", y = "Count")+
   theme_classic()+
   theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
 
@@ -157,9 +146,7 @@ hit_map <- tm_shape(nc_dat) +
   tm_polygons("hit_pct",
               title = "Herd Immunity Threshold (HIT) %",
               palette = 'BuPu')+
-  tm_layout(main.title = "Herd Immunity Threshold (HIT) for Counties in NC for B.1.617.2",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -170,16 +157,14 @@ tmap_save(hit_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-mod
 pct_disc <- tm_shape(nc_dat) + 
   tm_polygons("pct_discrepency",
               title = "Percent Difference: HIT (%) - % Immune at Start",
-              palette = 'Greys')+
-  tm_layout(title = "Percent Difference: HIT (%) - % Immune at Start")
+              palette = 'Greys')
 pct_disc
 
 # make histogram of percent differences and compare with the histogram of need vaccination - symmetric
 pct_diff <- ggplot(nc_dat, aes(x=pct_discrepency))+
   geom_histogram(alpha = 0.3, color = "black")+
-  labs(title="Percent Difference = HIT (%) - % Immune at Start ",x="% Difference", y = "Count", subtitle = "NC Counties (N=100)")+
-  theme_classic()+
-  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+  labs(x="% Difference = HIT (%) - % Immune at Start", y = "Count")+
+  theme_classic()
 
 ggsave(plot=pct_diff, filename = "B.1.617.2_PctDiff_Hist.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
@@ -187,9 +172,7 @@ need_vaccination <- tm_shape(nc_dat) +
   tm_polygons("need_vaccination",
               title = "Number of People Needed to Vaccinate",
               palette = 'BuPu')+
-  tm_layout(main.title = "Number Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT",
-            main.title.position = c("left", "top"), 
-            legend.outside = TRUE,
+  tm_layout(legend.outside = TRUE,
             frame = FALSE)+
   tm_scale_bar(color.dark = "gray60", 
                position = c("left", "bottom"),
@@ -199,9 +182,8 @@ tmap_save(need_vaccination, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-imm
 # histogram of need vaccination - skew 
 nnv_hist <- ggplot(nc_dat, aes(x=need_vaccination))+
   geom_histogram(alpha = 0.3, color = "black")+
-  labs(title="Number of People Needed to Vaccinate 2 Weeks before B.1.617.2 Wave to Reach HIT ",x="Number of People Needed to Vaccinate", y = "Count", subtitle = "NC Counties (N=100)")+
-  theme_classic()+
-  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))
+  labs(x="Number of People Needed to Vaccinate (NNV)", y = "Count")+
+  theme_classic()
 ggsave(plot=nnv_hist, filename = "B.1.617.2_NNV_Hist.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
 
@@ -220,8 +202,6 @@ r0_boxplot$group <- as.factor(r0_boxplot$group)
 r0_bp <- ggviolin(r0_boxplot_ab, x = "group", y = "value",
           color = "group", palette =c("#00AFBB", "#E7B800", "#FC4E07"),
           add = "boxplot")+
-  ggtitle("Distributions for R0 parameters for B.1.617.2 (Delta), North Carolina Counties (N = 100)")+
-  theme(plot.title = element_text(hjust = 0.5))+
   rremove("legend")+
   xlab("Parameter")+ylab("Value")
 ggsave(plot=r0_bp, filename = "B.1.617.2_R0_Params_vPlot.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
@@ -279,11 +259,10 @@ prior_delta <- data.frame(DATE = "Start_Delta*", immunity_mean = nc_dat$immunity
 plot_dates <- rbind(plot_dates, prior_delta)
 immunity_ts_vplot <- ggviolin(plot_dates, x = "DATE", y = "immunity_mean",
          add = c("boxplot"))+
-  ggtitle("% Immune for North Carolina Counties (N = 100) from Start Vaccination to Before B.1.617.2")+
-  theme(plot.title = element_text(hjust = 0.5))+
   ylab("% Immune")+
   labs(caption = "*dates range from 2021-05-09 to 2021-07-04")
 ggsave(plot=immunity_ts_vplot, filename = "B.1.617.2_Immunity_TS_vPlot.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
 
 # get summary data
 plot_dates$DATE <- as.factor(plot_dates$DATE)
@@ -331,6 +310,36 @@ immunity_vacc_map <- tm_shape(immunity_components) +
 immunity_vacc_map
 tmap_save(immunity_vacc_map, filename = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\maps\\B.1.617.2_immunity_vacc_map.png")
 
+## component histograms 
+immunity_inf_hist <- ggplot(immunity_components, aes(x=immunity_by_inf)) + 
+  geom_histogram(fill = "gray", color = "black")+
+  xlab("Immunity % by Infection")+
+  ylab("Count")+
+  theme_classic()
+immunity_inf_hist
+
+ggsave(plot=immunity_inf_hist, filename = "B.1.617.2_immunity_inf_hist.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
+immunity_vacc_hist <- ggplot(immunity_components, aes(x=immunity_by_vacc)) + 
+  geom_histogram(fill = "gray", color = "black")+
+  xlab("Immunity % by Vaccination")+
+  ylab("Count")+
+  theme_classic()
+immunity_vacc_hist
+ggsave(plot=immunity_vacc_hist, filename = "B.1.617.2_immunity_vacc_hist.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
+immunity_mean_hist <- ggplot(immunity_components, aes(x=immunity_mean)) + 
+  geom_histogram(fill = "gray", color = "black")+
+  xlab("Immunity Mean")+
+  ylab("Count")+
+  theme_classic()
+immunity_mean_hist
+ggsave(plot=immunity_mean_hist, filename = "B.1.617.2_immunity_mean_hist.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+
+# get highest and lowest counties and percentages
+immunity_inf_order <- immunity_components[order(immunity_components$immunity_by_inf),][, c("CO_NAME", "immunity_by_inf")]
+immunity_vacc_order <- immunity_components[order(immunity_components$immunity_by_vacc),][, c("CO_NAME", "immunity_by_vacc")]
+immunity_mean_order <- immunity_components[order(immunity_components$immunity_mean),][, c("CO_NAME", "immunity_mean")]
 
 # boxplots for start & peak dates
 start <- data.frame(group = "Start Date", dates = nc_dat$start_date)
@@ -348,8 +357,6 @@ start_peak_plot <-ggplot(rbind(start,peak), aes(x=dates, fill=group))+
   geom_text(data = mu, aes(x=grp.mean, label = as.character(grp.mean), y=0.01), color = c('red', 'blue'))+
   xlab("Month")+
   ylab("Density")+
-  ggtitle("Start and Peak Date Distribution for B.1.617.2 in North Carolina Counties (N=100)")+
-  theme(plot.title = element_text(hjust = 0.5))+
   theme(legend.title = element_blank())
 ggsave(plot=start_peak_plot, filename = "B.1.617.2_StartPeak_dPlot.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
 
