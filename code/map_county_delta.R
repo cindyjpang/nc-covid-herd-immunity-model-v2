@@ -330,7 +330,7 @@ ggsave(plot=immunity_vacc_hist, filename = "B.1.617.2_immunity_vacc_hist.png", p
 
 immunity_mean_hist <- ggplot(immunity_components, aes(x=immunity_pct)) + 
   geom_histogram(fill = "gray", color = "black")+
-  xlab("Immunity Mean")+
+  xlab("% Immune")+
   ylab("Count")+
   theme_classic()
 immunity_mean_hist
