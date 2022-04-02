@@ -10,6 +10,8 @@ library(RColorBrewer)
 library(tidyverse)
 library(ggthemes)
 
+## Assumes working directory is "code_vc" (top level!)
+
 ## Read data
 shp <- st_read("data/nc shapefile/counties.shp")
 dat <- read_excel("exported data/delta_county_summary.xlsx")
@@ -58,6 +60,15 @@ imm_min <- min(c(immunity_components$immunity_by_inf,
                  immunity_components$immunity_by_vacc))
 norm_breaks <- seq(10, 75, by = 2.5)
 
+
+###'
+###'
+###'
+###' Plot immunity via infection
+###' 
+###' 
+###' 
+
 immunity_inf_hist <- ggplot(immunity_components, 
                             aes(x = immunity_by_inf)) + 
   geom_histogram(fill = "gray", 
@@ -82,6 +93,14 @@ ggsave(plot = immunity_inf_hist,
        units = "px")
 
 
+###'
+###'
+###'
+###' Plot immunity via vaccination
+###' 
+###' 
+###' 
+
 immunity_vac_hist <- ggplot(immunity_components, 
                             aes(x = immunity_by_vacc)) + 
   geom_histogram(fill = "gray", 
@@ -105,6 +124,14 @@ ggsave(plot = immunity_vac_hist,
        height = 900,
        units = "px")
 
+
+###'
+###'
+###'
+###' Plot immunity via both
+###' 
+###' 
+###' 
 
 immunity_all_hist <- ggplot(immunity_components, 
                             aes(x = immunity_pct)) + 
