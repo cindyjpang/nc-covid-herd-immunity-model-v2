@@ -10,6 +10,8 @@ library(RColorBrewer)
 library(tidyverse)
 library(tmap)
 library(magrittr)
+library(plyr)
+library(ggthemes)
 
 
 ## Assumes working directory is "code_vc" (top level!)
@@ -39,92 +41,56 @@ nc_dat <- merge(shp,
 nc_dat$start_date <- as.Date(nc_dat$start_date)
 nc_dat$peak_date <- as.Date(nc_dat$peak_date)
 
-## Create state polygon layer
-nc_st_poly <- shp %>% summarize()
+## Prep data
+start <- data.frame(group = "Start Date", dates = nc_dat$start_date)
+peak <- data.frame(group = "Peak Date", dates = nc_dat$peak_date)
 
-### Get some values for mapping
-imm_max <- max(immunity_components$immunity_pct)
-imm_min <- min(c(immunity_components$immunity_by_inf,
-                 immunity_components$immunity_by_vacc))
-norm_breaks <- c(-Inf, 20, 30, 40, 50, 60, 70, Inf)
-norm_colors <- brewer.pal(7, "YlGn")
+## Summarize data to get mean
+mu <- ddply(bind_rows(start, peak), 
+            "group", 
+            summarise, 
+            grp.mean = mean(dates))
 
+## Create plot
 
+start_peak_plot <-
+  ggplot(bind_rows(start, peak), 
+         aes(x = dates, 
+             fill = group)) +
+  scale_fill_manual(values = c("#4BB3B3", "#F26A42")) +
+  geom_density(color = "NA",
+               alpha = 0.4) +
+  stat_density(geom = "line", 
+               color = "black", 
+               alpha = 0.25) +
+  geom_vline(data = mu, 
+             aes(xintercept = grp.mean, 
+                 color = group),
+             linetype = "dashed",
+             alpha = 0.75) +
+  geom_text(data = mu, 
+            aes(x = grp.mean, 
+                y = 0.01,
+                label = as.character(grp.mean)), 
+            color = c("#1B328A", "#6A0001"))+
+  scale_color_manual(values = c("#4BB3B3", "#F26A42")) +
+  scale_y_continuous(expand = expansion(add = 0.000)) +
+  scale_x_date(date_breaks = "1 month",
+               date_labels = "%m/%Y",
+               expand = expansion(add = 1)) +
+  xlab("Date") +
+  ylab("Density") +
+  theme_pander() +
+  theme(legend.position = "none",
+        axis.title.y = element_text(margin = margin(r = 5)),
+        axis.text.y = element_text(margin = margin(r = 2)),
+        axis.title.x = element_text(margin = margin(t = 5)),
+        axis.text.x = element_text(margin = margin(t = 2.5)),
+        axis.line.x = element_line(color = "black"),
+        axis.ticks.length.x = unit(0.18, "cm"),
+        axis.ticks.x = element_line(color = "black", size = 0.6),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        plot.margin = margin(6, 8, 6, 6)) 
 
-###'
-###'
-###'
-###' Plot start date map
-###' 
-###' 
-###' 
-
-
-start_date_map <- 
-  tm_shape(nc_dat) + 
-  tm_polygons("start_date",
-              palette = "YlGnBu", 
-              # style = "quantile",
-              title = "Start date",
-              border.col = "black",        ## Color for the polygon lines
-              border.alpha = 0.75,          ## Transparency for the polygon lines
-              lwd = 0.6,) +
-  tm_shape(nc_st_poly) +
-  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
-  tm_layout(legend.outside = TRUE,
-            # legend.height = 0.5,
-            # legend.text.size = 1,
-            # legend.title.size = 1.75,
-            inner.margins = rep(0.015, 4),
-            outer.margins = c(0.03,0,0.01,0),
-            frame = FALSE)
-
-tmap_save(start_date_map, 
-          filename = "maps/date_start_delta.png", 
-          width = 1000,
-          dpi = 140)
-
-
-###'
-###'
-###'
-###' Plot peak date map
-###' 
-###' 
-###' 
-
-### Some magic to fix the legend issue
-# Create new bbox from original layer
-bbox_new <- st_bbox(nc_dat)
-# Add some to Y max and Y min
-# Y min
-bbox_new[2] <- bbox_new[2] - 25000
-# Y max
-bbox_new[4] <- bbox_new[4] + 25000
-# Create sf object
-bbox_new %<>% st_as_sfc()
-
-peak_date_map <-
-  tm_shape(nc_dat,
-           bbox = bbox_new) + 
-  tm_polygons("peak_date",
-              palette = "OrRd", 
-              # style = "quantile",
-              title = "Peak date",
-              border.col = "black",        ## Color for the polygon lines
-              border.alpha = 0.75,          ## Transparency for the polygon lines
-              lwd = 0.6,) +
-  tm_shape(nc_st_poly) +
-  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
-  tm_layout(legend.outside = TRUE,
-            legend.height = 0.2,
-            # legend.text.size = 1,
-            # legend.title.size = 1.75,
-            inner.margins = rep(0.015, 4),
-            outer.margins = c(0.03,0,0.01,0),
-            frame = FALSE)
-
-tmap_save(peak_date_map, 
-          filename = "maps/date_peak_delta.png", 
-          width = 1000,
-          dpi = 140)
+ggsave(plot=start_peak_plot, filename = "B.1.617.2_StartPeak_dPlot.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
