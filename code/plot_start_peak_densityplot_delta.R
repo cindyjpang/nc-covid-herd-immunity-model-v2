@@ -1,5 +1,5 @@
 ##
-#### Create maps for Delta wave COVID-19 paper
+#### Create density plot for start/peak Delta wave COVID-19 paper
 ##
 #### Built from Cindy's code, map_county_delta.R
 ##
@@ -41,6 +41,14 @@ nc_dat$peak_date <- as.Date(nc_dat$peak_date)
 
 ## Create state polygon layer
 nc_st_poly <- shp %>% summarize()
+
+### Get some values for mapping
+imm_max <- max(immunity_components$immunity_pct)
+imm_min <- min(c(immunity_components$immunity_by_inf,
+                 immunity_components$immunity_by_vacc))
+norm_breaks <- c(-Inf, 20, 30, 40, 50, 60, 70, Inf)
+norm_colors <- brewer.pal(7, "YlGn")
+
 
 
 ###'
