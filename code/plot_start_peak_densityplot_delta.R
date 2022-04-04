@@ -84,13 +84,19 @@ start_peak_plot <-
   theme(legend.position = "none",
         axis.title.y = element_text(margin = margin(r = 5)),
         axis.text.y = element_text(margin = margin(r = 2)),
-        axis.title.x = element_text(margin = margin(t = 5)),
+        axis.title.x = element_text(margin = margin(t = 4)),
         axis.text.x = element_text(margin = margin(t = 2.5)),
         axis.line.x = element_line(color = "black"),
         axis.ticks.length.x = unit(0.18, "cm"),
         axis.ticks.x = element_line(color = "black", size = 0.6),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        plot.margin = margin(6, 8, 6, 6)) 
+        plot.margin = margin(6, 10, 4, 6)) 
 
-ggsave(plot=start_peak_plot, filename = "B.1.617.2_StartPeak_dPlot.png", path = "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\images", device = "png")
+ggsave(plot = start_peak_plot, 
+       filename = "density_start_peak_delta.png", 
+       path = "images", 
+       device = "png",
+       width = 2400,
+       height = 800,
+       units = "px")
