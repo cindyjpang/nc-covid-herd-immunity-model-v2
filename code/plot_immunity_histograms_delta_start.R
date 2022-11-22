@@ -155,3 +155,68 @@ ggsave(plot = immunity_all_hist,
        width = 1200,
        height = 900,
        units = "px")
+
+
+###'
+###'
+###'
+###' Plot immunity via infection vs immunity via vaccination
+###' 
+###' 
+###' 
+###' 
+text_size <- 5
+
+cor.result <- cor.test(immunity_components$immunity_by_inf, immunity_components$immunity_by_vacc)
+pval <- cor.result$p.value
+rval <- round(cor.result$estimate, digits = 2)
+
+
+immunity_compare <- ggplot(immunity_components, aes(x = immunity_by_inf, y = immunity_by_vacc))+
+  geom_point()+
+  xlab("Immunity by Infection (%)")+
+  ylab("Immunity by Vaccination (%)")+
+  theme_pander()+
+  geom_text(x = 45, 
+            y = 60, 
+            hjust = 0, 
+            label = paste0("R = ", rval), 
+            size = text_size)+
+  geom_text(x = 45, 
+            y = 57, 
+            hjust = 0, 
+            label = "p < 0.01", 
+            size = text_size)
+ggsave(plot = immunity_compare, 
+       filename = "scatterplots_immunity_vaccination_infection.png", 
+       path = "images", 
+       device = "png",
+       width = 1200,
+       height = 900,
+       units = "px")
+
+###'
+###'
+###'
+###' Plot start vs peak date, response to R.
+###' 
+###' 
+###' 
+###
+cor.start.peak <- cor.test(immunity_components$start_date, immunity_components$peak_date)
+delta_start_peak_cor <- ggplot(immunity_components, aes(x = start_date, y = peak_date))+
+  geom_point()+
+  xlab("Start Date")+
+  ylab("Peak Date")+
+  theme_pander()+
+  geom_text(x = 45, 
+            y = 60, 
+            hjust = 0, 
+            label = paste0("R = ", round(cor.start.peak$estimate)), 
+            size = text_size)+
+  geom_text(x = 45, 
+            y = 57, 
+            hjust = 0, 
+            label = "p < 0.01", 
+            size = text_size)
+  
