@@ -203,20 +203,35 @@ ggsave(plot = immunity_compare,
 ###' 
 ###' 
 ###
-cor.start.peak <- cor.test(immunity_components$start_date, immunity_components$peak_date)
+ref.date <- as.Date("2021-01-01")
+start.peak.cor.df <- data.frame(start_date = immunity_components$start_date, 
+                                peak_date = immunity_components$peak_date)%>%
+  mutate(ref.start = as.numeric(difftime(start_date, ref.date, units = "days")),
+         ref.peak = as.numeric(difftime(peak_date, ref.date, units = "days")))
+cor.start.peak <- cor.test(start.peak.cor.df$ref.start, start.peak.cor.df$ref.peak)
+# pval = 0.0002100211
+
 delta_start_peak_cor <- ggplot(immunity_components, aes(x = start_date, y = peak_date))+
   geom_point()+
   xlab("Start Date")+
   ylab("Peak Date")+
   theme_pander()+
-  geom_text(x = 45, 
-            y = 60, 
-            hjust = 0, 
-            label = paste0("R = ", round(cor.start.peak$estimate)), 
-            size = text_size)+
-  geom_text(x = 45, 
-            y = 57, 
-            hjust = 0, 
-            label = "p < 0.01", 
-            size = text_size)
+  geom_text(x = as.Date("2021-05-13"),
+            y = as.Date("2021-10-01"),
+            hjust = 0,
+            label = paste0("R = ", round(cor.start.peak$estimate, digits = 2)),
+            size = text_size+3)+
+  geom_text(x = as.Date("2021-05-13"),
+            y = as.Date("2021-09-28"),
+            hjust = 0,
+            label = "p < 0.01",
+            size = text_size+3)
+
+ggsave(plot = delta_start_peak_cor, 
+       filename = "scatterplots_start_peak.png", 
+       path = "images", 
+       device = "png",
+       width = 1200,
+       height = 800,
+       units = "px")
   
