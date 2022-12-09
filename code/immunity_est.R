@@ -88,7 +88,14 @@ immunity_dat <- mutate(
   death_inf_vacc_t_imm = (cum_death_inf_cases + cum_vacc_est_t - joint_death_inf_t)*100/Population,
   death_inf_vacc_obs_imm = (cum_death_inf_cases + cum_vacc_est_obs - joint_death_inf_obs)*100/Population,
   
-  ## pure infections daily count, no joint probabilities
+  ## lower bounds max()
+  rep_case_vacc_t_imm_lower = pmax(cum_reported_cases, cum_vacc_est_t)*100/Population,
+  rep_case_vacc_obs_imm_lower = pmax(cum_reported_cases, cum_vacc_est_obs)*100/Population,
+  cdc_case_vacc_t_imm_lower = pmax(cum_cdc_multiplier_cases, cum_vacc_est_t)*100/Population,
+  cdc_case_vacc_obs_imm_lower =pmax(cum_cdc_multiplier_cases, cum_vacc_est_obs)*100/Population, 
+  death_inf_vacc_t_imm_lower = pmax(cum_death_inf_cases, cum_vacc_est_t)*100/Population, 
+  death_inf_vacc_obs_imm_lower = pmax(cum_death_inf_cases, cum_vacc_est_obs)*100/Population                                  
+  
 )
 immunity_dat$immunity_mean = rowMeans(immunity_dat[,c(
   'cdc_case_vacc_t_imm',
@@ -109,7 +116,10 @@ immunity_dat$immunity_by_vacc = rowMeans(immunity_dat[, c(
   'cum_vacc_est_obs'
 )])*100/immunity_dat$Population
 
-
+ggplot(immunity_dat, aes(x=DATE))+
+  geom_line(aes(y = cum_reported_cases, col = "Red"))+
+   geom_line(aes(y = cum_vacc_est_t, col = "Blue"))
+   geom_line(aes(y = rep_case_vacc_t_imm_lower, col = "Black"))
 
 # write out to excel file 
 write_xlsx(immunity_dat, 'C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\immunity_est.xlsx')
