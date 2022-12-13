@@ -128,12 +128,12 @@ sir_initCond_death_inf_vacc_obs_imm_lower  <- mutate(
 
 
 # write csv for all 6 scenarios 
-write.csv(sir_initCond_cdc_case_vacc_obs_imm,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_cdc_case_vacc_obs_imm.csv")
-write.csv(sir_initCond_cdc_case_vacc_obs_imm_up,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_cdc_case_vacc_obs_imm_up.csv")
-write.csv(sir_initCond_cdc_case_vacc_obs_imm_lower,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_cdc_case_vacc_obs_imm_lower.csv")
-write.csv(sir_initCond_death_inf_vacc_obs_imm, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_death_inf_vacc_obs_imm.csv")
-write.csv(sir_initCond_death_inf_vacc_obs_imm_up, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_death_inf_vacc_obs_imm_up.csv")
-write.csv(sir_initCond_death_inf_vacc_obs_imm_lower, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\exported data\\sensitivity analysis data export\\sir_initCond_death_inf_vacc_obs_imm_lower.csv")
+write.csv(sir_initCond_cdc_case_vacc_obs_imm,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S1\\sir_initCond_cdc_case_vacc_obs_imm.csv")
+write.csv(sir_initCond_cdc_case_vacc_obs_imm_up,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S2\\sir_initCond_cdc_case_vacc_obs_imm_up.csv")
+write.csv(sir_initCond_cdc_case_vacc_obs_imm_lower,"C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S3\\sir_initCond_cdc_case_vacc_obs_imm_lower.csv")
+write.csv(sir_initCond_death_inf_vacc_obs_imm, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S4\\sir_initCond_death_inf_vacc_obs_imm.csv")
+write.csv(sir_initCond_death_inf_vacc_obs_imm_up, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S5\\sir_initCond_death_inf_vacc_obs_imm_up.csv")
+write.csv(sir_initCond_death_inf_vacc_obs_imm_lower, "C:\\Users\\Cindy Pang\\nc-covid-herd-immunity-model-v2\\sensitivity analysis\\outputs\\S6\\sir_initCond_death_inf_vacc_obs_imm_lower.csv")
 
 
 
