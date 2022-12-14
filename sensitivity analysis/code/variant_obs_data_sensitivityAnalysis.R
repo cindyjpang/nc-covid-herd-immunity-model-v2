@@ -27,25 +27,32 @@ library(zoo)
 library(ggpmisc)
 
 
-
 scenarios <- c("S1/sir_initCond_cdc_case_vacc_obs_imm.csv", "S2/sir_initCond_cdc_case_vacc_obs_imm_up.csv", "S3/sir_initCond_cdc_case_vacc_obs_imm_lower.csv", "S4/sir_initCond_death_inf_vacc_obs_imm.csv", "S5/sir_initCond_death_inf_vacc_obs_imm_up.csv", "S6/sir_initCond_death_inf_vacc_obs_imm_lower.csv")
-
+# 
 for(scenario in scenarios){
   read_file_path <- paste0("./sensitivity analysis/outputs/", scenario)
   print(read_file_path)
   
   nc_dat <- read.csv(read_file_path)
-  nc_dat <- filter(nc_dat, I!=0)[, c('COUNTY', 'DATE', 'N', 'I', 'R', 'S')]
+  nc_dat <- filter(nc_dat, I > 0)[, c('COUNTY', 'DATE', 'N', 'I', 'R', 'S')]
   nc_dat$DATE <- as.Date(nc_dat$DATE)
   
   
   ## Set minimum date to May 1st 2021
   #start_search <- as.Date("2021-04-01")
-  nc_dat <- nc_dat %>%
+  
+  if(scenario == "S4/sir_initCond_death_inf_vacc_obs_imm.csv" | scenario == "S5/sir_initCond_death_inf_vacc_obs_imm_up.csv" | scenario == "S6/sir_initCond_death_inf_vacc_obs_imm_lower.csv"){
+    nc_dat <- nc_dat %>%
+      group_by(COUNTY)%>%
+      mutate(days_since_start = as.numeric(difftime(DATE, as.Date("2020-01-01"), units = c('days'))))%>%
+      filter(COUNTY != "Missing")
+  }else{ 
+    nc_dat <- nc_dat %>%
     group_by(COUNTY)%>%
     mutate(days_since_start = as.numeric(difftime(DATE, as.Date("2020-01-01"), units = c('days'))))%>%
-    filter(COUNTY != "Missing")
-  
+    filter(COUNTY != "Missing", DATE >= as.Date("2021-01-01"))
+  }
+ 
   
   counties <- unique(nc_dat$COUNTY)
   smoothed_inf <- c()
@@ -73,13 +80,19 @@ for(scenario in scenarios){
   
   
   # test for the best minima, screens out noise, out of the three which has the min(smoothed_inf)
-  test <- nc_dat %>% group_by(COUNTY)%>%filter(minima == TRUE)%>%summarise(min_dates = tail(DATE,3))
-  test <- test[test$min_dates >= as.Date('2021-04-01'), ]
-  test <- test %>% add_count(COUNTY) # filter the dates which are strictly delta vs omicron waves
+  nc_dat$COUNTY <- as.factor(nc_dat$COUNTY)
+  test <- nc_dat %>% 
+    group_by(COUNTY)%>%
+    filter(minima == TRUE & DATE >= as.Date("2021-04-30") & DATE <= as.Date("2021-10-01"))%>%
+    summarise(min_dates = tail(DATE,2))
+  #test <- test[test$min_dates >= as.Date('2021-04-30'), ]
+  #test <- test %>% add_count(COUNTY) # filter the dates which are strictly delta vs omicron waves
+  View(test)
   
   delta_dates <- test %>%
     group_by(COUNTY)%>%
     summarize(delta_start = min(min_dates))
+    
   
   missing_counties <- setdiff(counties, delta_dates$COUNTY)
   
@@ -87,10 +100,13 @@ for(scenario in scenarios){
   rep_num <- length(missing_counties)
   
   # build dataframe for binding
-  temp_df <- data.frame(COUNTY = missing_counties, 
-                        delta_start = rep(as.Date("2021-05-01"), rep_num))
-  
-  delta_dates <- rbind(delta_dates, temp_df)
+  if(rep_num > 0){
+    temp_df <- data.frame(COUNTY = missing_counties, 
+                          delta_start = rep(as.Date("2021-05-01"), rep_num))
+    
+    delta_dates <- rbind(delta_dates, temp_df)
+  }
+
   
   delta_obs_dat <- data.frame()
   for(county in counties){
@@ -118,30 +134,28 @@ for(scenario in scenarios){
   
   path_str <- "./sensitivity analysis/outputs/"
   if(scenario == "S1/sir_initCond_cdc_case_vacc_obs_imm.csv"){
-      write_path <- paste0(path_str, "S1/delta_obs_dat_cdc_case_vacc_obs_imm.xlsx")
+      write_path <- paste0(path_str, "S1/delta_obs_dat_S1.xlsx")
       write_xlsx(delta_obs_dat, write_path)
   }else if(scenario == "S2/sir_initCond_cdc_case_vacc_obs_imm_up.csv"){
-    write_path <- paste0(path_str, "S2/delta_obs_dat_cdc_case_vacc_obs_imm_up.xlsx")
+    write_path <- paste0(path_str, "S2/delta_obs_dat_S2.xlsx")
     write_xlsx(delta_obs_dat, write_path)
   }else if(scenario == "S3/sir_initCond_cdc_case_vacc_obs_imm_lower.csv"){
-    write_path <- paste0(path_str, "S3/delta_obs_dat_cdc_case_vacc_obs_imm_lower.xlsx")
+    write_path <- paste0(path_str, "S3/delta_obs_dat_S3.xlsx")
     write_xlsx(delta_obs_dat, write_path)
   }else if(scenario == "S4/sir_initCond_death_inf_vacc_obs_imm.csv"){
-    write_path <- paste0(path_str, "S4/delta_obs_dat_death_inf_vacc_obs_imm.xlsx")
+    write_path <- paste0(path_str, "S4/delta_obs_dat_S4.xlsx")
     write_xlsx(delta_obs_dat, write_path)
   }else if(scenario == "S5/sir_initCond_death_inf_vacc_obs_imm_up.csv"){
-    write_path <- paste0(path_str, "S5/delta_obs_dat_death_inf_vacc_obs_imm_up.xlsx")
+    write_path <- paste0(path_str, "S5/delta_obs_dat_S5.xlsx")
     write_xlsx(delta_obs_dat, write_path)
   }else{
-    write_path <- paste0(path_str, "S6/delta_obs_dat_death_inf_vacc_obs_imm_lower.xlsx")
+    write_path <- paste0(path_str, "S6/delta_obs_dat_S6.xlsx")
     write_xlsx(delta_obs_dat, write_path)
-    
   }
   
   
   
-  
-  }
+}
 
 
 
