@@ -171,5 +171,456 @@ S6_DAT <- lower_bound_sort %>%
         all = FALSE)%>%
   mutate(excess = infection_only_death_pct_lower - vaccination_only_death_pct_lower)
 
+##
+##
+##
+## MAPPING ALL SCENARIOS
+## 
+##
+##
+
+## Create state polygon layer
+nc_st_poly <- shp %>% summarize()
+
+### Get some values for mapping
+#imm_max <- max(immunity_components$immunity_pct)
+#imm_min <- min(c(immunity_components$immunity_by_inf,
+#                 immunity_components$immunity_by_vacc))
+norm_breaks <- c(-Inf, 20, 30, 40, 50, 60, 70, Inf)
+norm_colors <- brewer.pal(7, "YlGn")
+
+
+###'
+###'
+###'
+###' Merge shapefile + data for all scenarios 
+###' 
+###' 
+###' 
+
+S1_MAP_DAT <- merge(shp, 
+                  S1_DAT, 
+                  by.x = "NAME", 
+                  by.y = "COUNTY", 
+                  all = TRUE)
+
+S2_MAP_DAT <- merge(shp, 
+                    S2_DAT, 
+                    by.x = "NAME", 
+                    by.y = "COUNTY", 
+                    all = TRUE)
+
+S3_MAP_DAT <- merge(shp, 
+                    S3_DAT, 
+                    by.x = "NAME", 
+                    by.y = "COUNTY", 
+                    all = TRUE)
+
+
+S4_MAP_DAT <- merge(shp, 
+                    S4_DAT, 
+                    by.x = "NAME", 
+                    by.y = "COUNTY", 
+                    all = TRUE)
+
+S5_MAP_DAT <- merge(shp, 
+                    S5_DAT, 
+                    by.x = "NAME", 
+                    by.y = "COUNTY", 
+                    all = TRUE)
+
+S6_MAP_DAT <- merge(shp, 
+                    S6_DAT, 
+                    by.x = "NAME", 
+                    by.y = "COUNTY", 
+                    all = TRUE)
+
+
+
+
+
+
+
+
+
+
+###'
+###'
+###'
+###' Plot overall immunity
+###' 
+###' 
+###' 
+
+# S1
+nc_imm_overall_map_S1 <- 
+  tm_shape(S1_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_cdc_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S1
+
+tmap_save(nc_imm_overall_map_S1, 
+          filename = "sensitivity analysis/maps/S1/imm_overall_delta_start_S1.png", 
+          width = 1000,
+          dpi = 140)
+
+# S2
+nc_imm_overall_map_S2 <- 
+  tm_shape(S2_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_cdc_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S2
+
+tmap_save(nc_imm_overall_map_S2, 
+          filename = "sensitivity analysis/maps/S2/imm_overall_delta_start_S2.png", 
+          width = 1000,
+          dpi = 140)
+
+# S3
+
+nc_imm_overall_map_S3 <- 
+  tm_shape(S3_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_imm_cdc_lower",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S3
+
+tmap_save(nc_imm_overall_map_S3, 
+          filename = "sensitivity analysis/maps/S3/imm_overall_delta_start_S3.png", 
+          width = 1000,
+          dpi = 140)
+
+# S4
+nc_imm_overall_map_S4 <- 
+  tm_shape(S4_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_death_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S4
+
+tmap_save(nc_imm_overall_map_S4, 
+          filename = "sensitivity analysis/maps/S4/imm_overall_delta_start_S4.png", 
+          width = 1000,
+          dpi = 140)
+
+# S5
+nc_imm_overall_map_S5 <- 
+  tm_shape(S5_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_death_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S5
+
+tmap_save(nc_imm_overall_map_S5, 
+          filename = "sensitivity analysis/maps/S5/imm_overall_delta_start_S5.png", 
+          width = 1000,
+          dpi = 140)
+
+# s6
+nc_imm_overall_map_S6 <- 
+  tm_shape(S6_MAP_DAT) +                   ## The R object
+  tm_polygons("overall_imm_death_lower",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_overall_map_S6
+
+tmap_save(nc_imm_overall_map_S6, 
+          filename = "sensitivity analysis/maps/S6/imm_overall_delta_start_S6.png", 
+          width = 1000,
+          dpi = 140)
+
+
+
+###'
+###'
+###'
+###' Plot immunity via infection
+###' 
+###' 
+###' 
+
+nc_imm_inf_map_S1 <- 
+  tm_shape(S1_MAP_DAT) +                   ## The R object
+  tm_polygons("infection_cdc_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S1
+
+tmap_save(nc_imm_inf_map_S1, 
+          filename = "sensitivity analysis/maps/imm_inf_delta_start_S1.png", 
+          width = 1000,
+          dpi = 140)
+
+# S2
+nc_imm_inf_map_S2 <- 
+  tm_shape(S2_MAP_DAT) +                   ## The R object
+  tm_polygons("infection_cdc_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S2
+
+tmap_save(nc_imm_inf_map_S2, 
+          filename = "sensitivity analysis/maps/S2/imm_inf_delta_start_S2.png", 
+          width = 1000,
+          dpi = 140)
+
+# S4
+
+nc_imm_inf_map_S4 <- 
+  tm_shape(S4_MAP_DAT) +                   ## The R object
+  tm_polygons("infection_death_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S4
+
+tmap_save(nc_imm_overall_map_S4, 
+          filename = "sensitivity analysis/maps/S4/imm_inf_delta_start_S4.png", 
+          width = 1000,
+          dpi = 140)
+
+# S5
+
+nc_imm_inf_map_S5 <- 
+  tm_shape(S5_MAP_DAT) +                   ## The R object
+  tm_polygons("infection_death_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S5
+
+tmap_save(nc_imm_inf_map_S5, 
+          filename = "sensitivity analysis/maps/S5/imm_inf_delta_start_S5.png", 
+          width = 1000,
+          dpi = 140)
+
+###'
+###'
+###'
+###' Plot immunity via vaccination
+###' 
+###' 
+###
+
+nc_imm_vacc_map_S1 <- 
+  tm_shape(S1_MAP_DAT) +                   ## The R object
+  tm_polygons("vaccination_cdc_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S1
+
+tmap_save(nc_imm_vacc_map_S1, 
+          filename = "sensitivity analysis/maps/imm_vacc_delta_start_S1.png", 
+          width = 1000,
+          dpi = 140)
+
+# S2
+nc_imm_vacc_map_S2 <- 
+  tm_shape(S2_MAP_DAT) +                   ## The R object
+  tm_polygons("vaccination_cdc_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S2
+
+tmap_save(nc_imm_vacc_map_S2, 
+          filename = "sensitivity analysis/maps/S2/imm_vacc_delta_start_S2.png", 
+          width = 1000,
+          dpi = 140)
+
+# S4
+
+nc_imm_vacc_map_S4 <- 
+  tm_shape(S4_MAP_DAT) +                   ## The R object
+  tm_polygons("vaccination_death_indep",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S4
+
+tmap_save(nc_imm_overall_map_S4, 
+          filename = "sensitivity analysis/maps/S4/imm_vacc_delta_start_S4.png", 
+          width = 1000,
+          dpi = 140)
+
+# S5
+
+nc_imm_vacc_map_S5 <- 
+  tm_shape(S5_MAP_DAT) +                   ## The R object
+  tm_polygons("vaccination_death_upper",                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S5
+
+tmap_save(nc_imm_vacc_map_S5, 
+          filename = "sensitivity analysis/maps/S5/imm_vacc_delta_start_S5.png", 
+          width = 1000,
+          dpi = 140)
 
 
