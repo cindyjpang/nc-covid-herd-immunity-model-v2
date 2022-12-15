@@ -24,7 +24,6 @@ immunity_est <- read_excel("exported data/immunity_est.xlsx")
 ##
 
 immunity_scenarios_raw <- immunity_est %>%
-<<<<<<< HEAD
   mutate( ### CDC MULTIPLIER SCENARIOS
          overall_cdc_indep = cdc_case_vacc_obs_imm, 
          overall_cdc_upper = cdc_case_vacc_obs_imm_up, 
@@ -40,11 +39,4 @@ immunity_scenarios_raw <- immunity_est %>%
          overall_death_lower = death_inf_vacc_obs_imm_lower, 
          infection_death_indep = ((cum_death_inf_cases - joint_death_inf_obs)/Population)*100,
          infection_death_upper = (cum_death_inf_cases/Population)*100)
-=======
-  mutate(overall_cdc_indep = cdc_case_vacc_obs_imm, 
-         overall_cdc_upper = cdc_case_vacc_obs_imm_up, 
-         overall_cdc_lower = cdc_case_vacc_obs_imm_lower,
-         infection_cdc_indep = ((cum_cdc_multiplier_cases-joint_cdc_case_obs)/Population)*100,
-         infection_cdc_upper = (cum_cdc_multiplier_cases/Population)*100,
-         joint_cdc_vacc_lower_pct = cdc_case_vacc_obs_imm_lower - infection_cdc_upper - pct_vacc_est_obs)
->>>>>>> 1cac484d3997c3a8f164cae7fb88a4c957a7faf9
+
