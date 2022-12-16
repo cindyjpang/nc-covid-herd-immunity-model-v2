@@ -197,7 +197,7 @@ write_xlsx(S2_DAT, "./sensitivity analysis/outputs/S2/S2_start_immunity.xlsx")
 write_xlsx(S3_DAT, "./sensitivity analysis/outputs/S3/S3_start_immunity.xlsx")
 write_xlsx(S4_DAT, "./sensitivity analysis/outputs/S4/S4_start_immunity.xlsx")
 write_xlsx(S5_DAT, "./sensitivity analysis/outputs/S5/S5_start_immunity.xlsx")
-write_xlsx(S6_DAT, "./sensitivity analysis/outputs/S1/S6_start_immunity.xlsx")
+write_xlsx(S6_DAT, "./sensitivity analysis/outputs/S6/S6_start_immunity.xlsx")
 
 
 
