@@ -30,24 +30,6 @@ immunity_est <- read_excel("exported data/immunity_est.xlsx")
 immunity_est$infection_count <- rowMeans(immunity_est[, c('cdc_multiplier', 'death_est_total_inf')], na.rm = TRUE)
 
 
-
-# CDC_multiplier = CDC Infection Count 
-# dead_est_total_inf = Death Infection Count
-# immunity_est <- immunity_est %>%
-#   mutate()
-# plotting infection counts as a sanity check
-# df <- immunity_est %>%
-#   filter(COUNTY %in% unique(immunity_est$COUNTY))
-# 
-# p <- ggplot(df, aes(x = DATE, y = infection_count)) +
-#   geom_bar(
-#     aes(color = COUNTY, fill = COUNTY),
-#     stat = "identity", position = position_dodge(0.8),
-#     width = 0.7
-#   )
-# 
-# p
-
 sir_model <- immunity_est[, c('COUNTY', 'DATE', 'Population','immunity_mean', 'infection_count')]
 sir_model <- mutate(
   sir_model,
