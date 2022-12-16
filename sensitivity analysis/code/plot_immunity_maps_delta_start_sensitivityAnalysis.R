@@ -171,6 +171,26 @@ S6_DAT <- lower_bound_sort %>%
         all = FALSE)%>%
   mutate(excess = infection_only_death_pct_lower - vaccination_only_death_pct_lower)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##
 ##
 ##
