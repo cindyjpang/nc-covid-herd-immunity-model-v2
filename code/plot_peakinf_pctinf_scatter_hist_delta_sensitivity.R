@@ -16,6 +16,8 @@ library(ggExtra)
 
 ## Assumes working directory is "code_vc" (top level!)
 
+## Assumes working directory is "code_vc" (top level!)
+
 ## Read data
 shp <- st_read("data/cartographic_boundaries/cb_2018_nc_county_5m.shp")
 immunity_est <- read_excel("exported data/immunity_est.xlsx")
@@ -30,113 +32,105 @@ shp$CO_NAME <- toupper(shp$NAME)
 
 ## Start looping through sensitivity analysis
 for (s in c(paste0("S", 1:6))) {
-
-dat <- read_excel(paste0("sensitivity analysis/outputs/",
-                         s,
-                         "/delta_county_summary_",
-                         s,
-                         ".xlsx"))
-
-## change and merge data
-dat$COUNTY <- toupper(dat$COUNTY)
-names(dat)[1] <- 'CO_NAME'
-
-## If many entries for peak date, pick middle?
-if (nrow(dat) > 100) {
   
-  # Get middle date for each
-  dat_summary <- dat %>% group_by(CO_NAME) %>%
-    summarize(peak_date_median = median(peak_date))
+  dat <- read_excel(paste0("sensitivity analysis/outputs/",
+                           s,
+                           "/delta_county_summary_",
+                           s,
+                           ".xlsx"))
   
-  # Join, subset
-  dat %<>% merge(dat_summary,
-                 by = "CO_NAME")
-  dat %<>% filter(peak_date == peak_date_median)
+  ## change and merge data
+  dat$COUNTY <- toupper(dat$COUNTY)
+  names(dat)[1] <- 'CO_NAME'
   
-}
-
-## merge
-nc_dat <- merge(shp,
-                dat,
-                by = 'CO_NAME',
-                all = TRUE)
-## merge
-nc_dat <- merge(nc_dat,
-                immunity_dat[, c("CO_NAME", "Vc", "immunity_mean", "Population", "thr_hit", "discrepency", "need_vaccination", "pct_discrepency", "vacc_date")],
-                by = 'CO_NAME',
-                all = TRUE)
-
-## calculations/conversions
-nc_dat$immunity_pct <- nc_dat$immunity_mean*100
-nc_dat$hit_pct <- nc_dat$Vc*100
-nc_dat$beta.hat <- as.numeric(nc_dat$beta.hat)
-nc_dat$gamma.hat <- as.numeric(nc_dat$gamma.hat)
-nc_dat$r0.hat <- as.numeric(nc_dat$r0.hat)
-nc_dat$start_date <- as.Date(nc_dat$start_date)
-nc_dat$peak_date <- as.Date(nc_dat$peak_date)
-
-## Snap dates to beginning of each week for display purpose
-nc_dat$start_date_snap <- floor_date(nc_dat$start_date, "weeks")
-nc_dat$peak_date_snap <- floor_date(nc_dat$peak_date, "weeks")
-
-## Merge data for component mapping 
-immunity_components <- merge(nc_dat, 
-                             immunity_est[, c('CO_NAME', 'DATE', 'immunity_by_inf', 'immunity_by_vacc')], 
-                             by.x = c('CO_NAME', 'start_date'),
-                             by.y = c('CO_NAME', 'DATE'), 
-                             all = FALSE)
-
-
-## Things that I want to report
-# Peak infection rate of Delta
-# Number/proportion people infected during Delta
-
-### Peak weekly infections
-immunity_components$peak_inf_rate <- immunity_components$I_proj_peak / immunity_components$Population
-
-
-## Create empty holder for total estimated infections during Delta
-delta_dat <- NULL
-
-## Filter data to only post beginning of delta wave for each county
-for (i in 1:nrow(immunity_dat)) {
+  ## If many entries for peak date, pick middle?
+  if (nrow(dat) > 100) {
+    
+    # Get middle date for each
+    dat_summary <- dat %>% group_by(CO_NAME) %>%
+      summarize(peak_date_median = median(peak_date))
+    
+    # Join, subset
+    dat %<>% merge(dat_summary,
+                   by = "CO_NAME")
+    dat %<>% filter(peak_date == peak_date_median)
+    
+  }
   
-  ## Create subset
-  temp <- immunity_est %>% filter(CO_NAME == immunity_dat$CO_NAME[i] & 
-                                    DATE >= immunity_dat$start_date[i]-7 &
-                                    DATE < as.Date("2021-12-01"))
+  ## merge
+  nc_dat <- merge(shp,
+                  dat,
+                  by = 'CO_NAME',
+                  all = TRUE)
+  ## merge
+  nc_dat <- merge(nc_dat,
+                  immunity_dat[, c("CO_NAME", "Population")],
+                  by = 'CO_NAME',
+                  all = TRUE)
   
-  ## Calculate mean number of estimated infections
-  ##   Using CDC multiplier and Deaths
-  temp$cum_inf_estimate <- temp %>% 
-    select(cum_cdc_multiplier_cases, cum_death_inf_cases) %>%
-    rowMeans()
+  ## calculations/conversions
+  nc_dat$beta.hat <- as.numeric(nc_dat$beta.hat)
+  nc_dat$gamma.hat <- as.numeric(nc_dat$gamma.hat)
+  nc_dat$r0.hat <- as.numeric(nc_dat$r0.hat)
+  nc_dat$start_date <- as.Date(nc_dat$start_date)
+  nc_dat$peak_date <- as.Date(nc_dat$peak_date)
   
-  ## Subtract last row from first row
-  delta_inf <- temp$cum_inf_estimate[nrow(temp)] - temp$cum_inf_estimate[1]
+  ## Snap dates to beginning of each week for display purpose
+  nc_dat$start_date_snap <- floor_date(nc_dat$start_date, "weeks")
+  nc_dat$peak_date_snap <- floor_date(nc_dat$peak_date, "weeks")
   
-  ## Select columns and bind to holder
-  delta_dat <- bind_rows(delta_dat,
-                         tibble(COUNTY = immunity_dat$CO_NAME[i],
-                                inf_est_delta = delta_inf,
-                                Population = temp$Population[1]))
   
-}
-
-## Calculate proportion
-delta_dat$inf_est_delta_prop <- delta_dat$inf_est_delta / delta_dat$Population
-
-
-## Merge Delta infections with data
-immunity_components <- merge(immunity_components,
-                             delta_dat[,-c(3)],
-                             by.x = "CO_NAME",
-                             by.y = "COUNTY",
-                             all.x = TRUE)
-
-
-## Create state polygon layer
-nc_st_poly <- immunity_components %>% summarize()
+  ## Things that I want to report
+  # Peak infection rate of Delta
+  # Number/proportion people infected during Delta
+  
+  ### Peak weekly infections
+  nc_dat$peak_inf_rate <- nc_dat$I_proj_peak / nc_dat$Population
+  
+  
+  ## Create empty holder for total estimated infections during Delta
+  delta_dat <- NULL
+  
+  ## Read in data for calcualtion
+  inf_delta <- read_xlsx(paste0("sensitivity analysis/outputs/",
+                                s,
+                                "/delta_obs_dat_",
+                                s,
+                                ".xlsx"))
+  
+  ## change and merge data
+  inf_delta$COUNTY <- toupper(inf_delta$COUNTY)
+  names(inf_delta)[1] <- 'CO_NAME'
+  
+  ## Filter data to only post beginning of delta wave for each county
+  for (i in 1:nrow(nc_dat)) {
+    
+    ## Create subset
+    temp <- inf_delta %>% filter(CO_NAME == nc_dat$CO_NAME[i] & 
+                                   DATE < as.Date("2021-12-01"))
+    
+    ## Calculate number of estimated infections
+    delta_inf <- sum(temp$I, na.rm = TRUE)
+    
+    ## Select columns and bind to holder
+    delta_dat <- bind_rows(delta_dat,
+                           tibble(COUNTY = immunity_dat$CO_NAME[i],
+                                  inf_est_delta = delta_inf,
+                                  Population = temp$N[1]))
+    
+  }
+  
+  ## Calculate proportion
+  delta_dat$inf_est_delta_prop <- delta_dat$inf_est_delta / delta_dat$Population
+  
+  
+  ## Merge Delta infections with data
+  immunity_components <- merge(nc_dat,
+                               delta_dat[,-c(3)],
+                               by.x = "CO_NAME",
+                               by.y = "COUNTY",
+                               all.x = TRUE)
+  
 
 
 ###'
