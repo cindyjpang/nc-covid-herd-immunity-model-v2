@@ -162,15 +162,15 @@ inf_stdate <-
   scale_x_continuous(expand = expansion(mult = mult_value)) +
   xlab("Peak Weekly Infection Rate (per 10,000 people)") +
   ylab("Total Infected (%)") +
-  geom_text(x = 210,
-            y = 8,
+  geom_text(x = max(immunity_components$peak_inf_rate10000)*0.75,
+            y = (min(immunity_components$inf_est_delta_pct)*1.25)+2,
             hjust = 0,
             label = paste0("R = ", round(inf_peak_tot_cor$estimate, 2)),
             size = text_size) +
-  geom_text(x = 210,
-            y = 6.25,
+  geom_text(x = max(immunity_components$peak_inf_rate10000)*0.75,
+            y = (min(immunity_components$inf_est_delta_pct)*1.25),
             hjust = 0,
-            label = "p < 0.01",
+            label = "p < 0.05",
             size = text_size) +
   theme_bw() +  
   theme(axis.text.y = element_text(margin = margin(r = 2)),
