@@ -121,13 +121,16 @@ lower_bound_sort <- immunity_est %>%
 ##
 ##
 
+col_names <- c("COUNTY", "DATE", "immunity_all", "immunity_by_infection", "immunity_by_vaccination")
 ## CDC INDEP
 S1_DAT <- immunity_scenarios_raw %>%
   select(COUNTY, DATE, overall_cdc_indep, infection_cdc_indep, vaccination_cdc_indep)%>%
   merge(filter(start_dates, scenario == "S1"),
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
-        all = FALSE)
+        all = FALSE)%>%
+  select(-scenario)
+colnames(S1_DAT) <- col_names
 
 ## CDC UPPER
 S2_DAT <- immunity_scenarios_raw %>%
@@ -135,7 +138,10 @@ S2_DAT <- immunity_scenarios_raw %>%
   merge(filter(start_dates, scenario == "S2"),
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
-        all = FALSE)
+        all = FALSE)%>%
+  select(-scenario)
+
+colnames(S2_DAT) <- col_names
 
 ## CDC LOWER
 S3_DAT <- lower_bound_sort %>%
@@ -144,7 +150,12 @@ S3_DAT <- lower_bound_sort %>%
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
         all = FALSE)%>%
-  mutate(excess = infection_only_cdc_pct_lower - vaccination_only_cdc_pct_lower)
+  mutate(excess = infection_only_cdc_pct_lower - vaccination_only_cdc_pct_lower,
+         infection_imm_cdc_lower = infection_and_vaccination_cdc_pct_lower + infection_only_cdc_pct_lower,
+         vaccination_imm_cdc_lower = infection_and_vaccination_cdc_pct_lower + vaccination_only_cdc_pct_lower)%>%
+  select(COUNTY, DATE, overall_imm_cdc_lower, infection_imm_cdc_lower, vaccination_imm_cdc_lower)
+  
+colnames(S3_DAT) <- col_names
 
 ## DEATH INDEP
 S4_DAT <- immunity_scenarios_raw %>%
@@ -152,7 +163,10 @@ S4_DAT <- immunity_scenarios_raw %>%
   merge(filter(start_dates, scenario == "S4"),
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
-        all = FALSE)
+        all = FALSE)%>%
+  select(-scenario)
+
+colnames(S4_DAT) <- col_names
 
 ## DEATH UPPER 
 S5_DAT <- immunity_scenarios_raw %>%
@@ -160,7 +174,10 @@ S5_DAT <- immunity_scenarios_raw %>%
   merge(filter(start_dates, scenario == "S5"),
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
-        all = FALSE)
+        all = FALSE)%>%
+  select(-scenario)
+
+colnames(S5_DAT) <- col_names
 
 ## DEATH LOWER
 S6_DAT <- lower_bound_sort %>%
@@ -169,7 +186,11 @@ S6_DAT <- lower_bound_sort %>%
         by.x = c("COUNTY", "DATE"), 
         by.y = c("COUNTY", "start_date"), 
         all = FALSE)%>%
-  mutate(excess = infection_only_death_pct_lower - vaccination_only_death_pct_lower)
+  mutate(excess = infection_only_death_pct_lower - vaccination_only_death_pct_lower, 
+         infection_imm_death_lower = infection_and_vaccination_death_pct_lower + infection_only_death_pct_lower,
+         vaccination_imm_death_lower = infection_and_vaccination_death_pct_lower + vaccination_only_death_pct_lower)%>%
+  select(COUNTY, DATE, overall_imm_death_lower, infection_imm_death_lower, vaccination_imm_death_lower)
+colnames(S6_DAT) <- col_names
 
 write_xlsx(S1_DAT, "./sensitivity analysis/outputs/S1/S1_start_immunity.xlsx")
 write_xlsx(S2_DAT, "./sensitivity analysis/outputs/S2/S2_start_immunity.xlsx")
@@ -276,10 +297,12 @@ S6_MAP_DAT <- merge(shp,
 ###' 
 ###' 
 
+s <- c("immunity_all", "immunity_by_infection", "immunity_by_vaccination")
+
 # S1
 nc_imm_overall_map_S1 <- 
   tm_shape(S1_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_cdc_indep",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -297,14 +320,14 @@ nc_imm_overall_map_S1 <-
 nc_imm_overall_map_S1
 
 tmap_save(nc_imm_overall_map_S1, 
-          filename = "sensitivity analysis/maps/S1/imm_overall_delta_start_S1.png", 
+          filename = "sensitivity analysis/maps/S1/imm_all_delta_start_S1.png", 
           width = 1000,
           dpi = 140)
 
 # S2
 nc_imm_overall_map_S2 <- 
   tm_shape(S2_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_cdc_upper",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -322,7 +345,7 @@ nc_imm_overall_map_S2 <-
 nc_imm_overall_map_S2
 
 tmap_save(nc_imm_overall_map_S2, 
-          filename = "sensitivity analysis/maps/S2/imm_overall_delta_start_S2.png", 
+          filename = "sensitivity analysis/maps/S2/imm_all_delta_start_S2.png", 
           width = 1000,
           dpi = 140)
 
@@ -330,7 +353,7 @@ tmap_save(nc_imm_overall_map_S2,
 
 nc_imm_overall_map_S3 <- 
   tm_shape(S3_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_imm_cdc_lower",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -348,14 +371,14 @@ nc_imm_overall_map_S3 <-
 nc_imm_overall_map_S3
 
 tmap_save(nc_imm_overall_map_S3, 
-          filename = "sensitivity analysis/maps/S3/imm_overall_delta_start_S3.png", 
+          filename = "sensitivity analysis/maps/S3/imm_all_delta_start_S3.png", 
           width = 1000,
           dpi = 140)
 
 # S4
 nc_imm_overall_map_S4 <- 
   tm_shape(S4_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_death_indep",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -373,14 +396,14 @@ nc_imm_overall_map_S4 <-
 nc_imm_overall_map_S4
 
 tmap_save(nc_imm_overall_map_S4, 
-          filename = "sensitivity analysis/maps/S4/imm_overall_delta_start_S4.png", 
+          filename = "sensitivity analysis/maps/S4/imm_all_delta_start_S4.png", 
           width = 1000,
           dpi = 140)
 
 # S5
 nc_imm_overall_map_S5 <- 
   tm_shape(S5_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_death_upper",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -398,14 +421,14 @@ nc_imm_overall_map_S5 <-
 nc_imm_overall_map_S5
 
 tmap_save(nc_imm_overall_map_S5, 
-          filename = "sensitivity analysis/maps/S5/imm_overall_delta_start_S5.png", 
+          filename = "sensitivity analysis/maps/S5/imm_all_delta_start_S5.png", 
           width = 1000,
           dpi = 140)
 
 # s6
 nc_imm_overall_map_S6 <- 
   tm_shape(S6_MAP_DAT) +                   ## The R object
-  tm_polygons("overall_imm_death_lower",                      ## Column with the data
+  tm_polygons(s[1],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -423,7 +446,7 @@ nc_imm_overall_map_S6 <-
 nc_imm_overall_map_S6
 
 tmap_save(nc_imm_overall_map_S6, 
-          filename = "sensitivity analysis/maps/S6/imm_overall_delta_start_S6.png", 
+          filename = "sensitivity analysis/maps/S6/imm_all_delta_start_S6.png", 
           width = 1000,
           dpi = 140)
 
@@ -439,7 +462,7 @@ tmap_save(nc_imm_overall_map_S6,
 
 nc_imm_inf_map_S1 <- 
   tm_shape(S1_MAP_DAT) +                   ## The R object
-  tm_polygons("infection_cdc_indep",                      ## Column with the data
+  tm_polygons(s[2],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -464,7 +487,7 @@ tmap_save(nc_imm_inf_map_S1,
 # S2
 nc_imm_inf_map_S2 <- 
   tm_shape(S2_MAP_DAT) +                   ## The R object
-  tm_polygons("infection_cdc_upper",                      ## Column with the data
+  tm_polygons(s[2],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -486,11 +509,36 @@ tmap_save(nc_imm_inf_map_S2,
           width = 1000,
           dpi = 140)
 
+# S3
+nc_imm_inf_map_S3 <- 
+  tm_shape(S3_MAP_DAT) +                   ## The R object
+  tm_polygons(s[2],                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S3
+
+tmap_save(nc_imm_inf_map_S3, 
+          filename = "sensitivity analysis/maps/S3/imm_inf_delta_start_S3.png", 
+          width = 1000,
+          dpi = 140)
+
 # S4
 
 nc_imm_inf_map_S4 <- 
   tm_shape(S4_MAP_DAT) +                   ## The R object
-  tm_polygons("infection_death_indep",                      ## Column with the data
+  tm_polygons(s[2],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -516,7 +564,7 @@ tmap_save(nc_imm_overall_map_S4,
 
 nc_imm_inf_map_S5 <- 
   tm_shape(S5_MAP_DAT) +                   ## The R object
-  tm_polygons("infection_death_upper",                      ## Column with the data
+  tm_polygons(s[2],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -538,6 +586,30 @@ tmap_save(nc_imm_inf_map_S5,
           width = 1000,
           dpi = 140)
 
+# S6
+nc_imm_inf_map_S6 <- 
+  tm_shape(S6_MAP_DAT) +                   ## The R object
+  tm_polygons(s[2],                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_inf_map_S6
+
+tmap_save(nc_imm_inf_map_S6, 
+          filename = "sensitivity analysis/maps/S6/imm_inf_delta_start_S6.png", 
+          width = 1000,
+          dpi = 140)
 ###'
 ###'
 ###'
@@ -548,7 +620,7 @@ tmap_save(nc_imm_inf_map_S5,
 
 nc_imm_vacc_map_S1 <- 
   tm_shape(S1_MAP_DAT) +                   ## The R object
-  tm_polygons("vaccination_cdc_indep",                      ## Column with the data
+  tm_polygons(s[3],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -566,14 +638,14 @@ nc_imm_vacc_map_S1 <-
 nc_imm_vacc_map_S1
 
 tmap_save(nc_imm_vacc_map_S1, 
-          filename = "sensitivity analysis/maps/imm_vacc_delta_start_S1.png", 
+          filename = "sensitivity analysis/maps/imm_vac_delta_start_S1.png", 
           width = 1000,
           dpi = 140)
 
 # S2
 nc_imm_vacc_map_S2 <- 
   tm_shape(S2_MAP_DAT) +                   ## The R object
-  tm_polygons("vaccination_cdc_upper",                      ## Column with the data
+  tm_polygons(s[3],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -591,7 +663,32 @@ nc_imm_vacc_map_S2 <-
 nc_imm_vacc_map_S2
 
 tmap_save(nc_imm_vacc_map_S2, 
-          filename = "sensitivity analysis/maps/S2/imm_vacc_delta_start_S2.png", 
+          filename = "sensitivity analysis/maps/S2/imm_vac_delta_start_S2.png", 
+          width = 1000,
+          dpi = 140)
+
+# S2
+nc_imm_vacc_map_S3 <- 
+  tm_shape(S3_MAP_DAT) +                   ## The R object
+  tm_polygons(s[3],                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S3
+
+tmap_save(nc_imm_vacc_map_S3, 
+          filename = "sensitivity analysis/maps/S3/imm_vac_delta_start_S3.png", 
           width = 1000,
           dpi = 140)
 
@@ -599,7 +696,7 @@ tmap_save(nc_imm_vacc_map_S2,
 
 nc_imm_vacc_map_S4 <- 
   tm_shape(S4_MAP_DAT) +                   ## The R object
-  tm_polygons("vaccination_death_indep",                      ## Column with the data
+  tm_polygons(s[3],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -617,7 +714,7 @@ nc_imm_vacc_map_S4 <-
 nc_imm_vacc_map_S4
 
 tmap_save(nc_imm_overall_map_S4, 
-          filename = "sensitivity analysis/maps/S4/imm_vacc_delta_start_S4.png", 
+          filename = "sensitivity analysis/maps/S4/imm_vac_delta_start_S4.png", 
           width = 1000,
           dpi = 140)
 
@@ -625,7 +722,7 @@ tmap_save(nc_imm_overall_map_S4,
 
 nc_imm_vacc_map_S5 <- 
   tm_shape(S5_MAP_DAT) +                   ## The R object
-  tm_polygons("vaccination_death_upper",                      ## Column with the data
+  tm_polygons(s[3],                      ## Column with the data
               title = "",  ## Legend title 
               #              style = "pretty",
               breaks = norm_breaks,
@@ -643,7 +740,32 @@ nc_imm_vacc_map_S5 <-
 nc_imm_vacc_map_S5
 
 tmap_save(nc_imm_vacc_map_S5, 
-          filename = "sensitivity analysis/maps/S5/imm_vacc_delta_start_S5.png", 
+          filename = "sensitivity analysis/maps/S5/imm_vac_delta_start_S5.png", 
+          width = 1000,
+          dpi = 140)
+
+# S6
+nc_imm_vacc_map_S6 <- 
+  tm_shape(S6_MAP_DAT) +                   ## The R object
+  tm_polygons(s[3],                      ## Column with the data
+              title = "",  ## Legend title 
+              #              style = "pretty",
+              breaks = norm_breaks,
+              palette = norm_colors,          ## Color ramp for the polygon fills
+              alpha = 1,                   ## Transparency for the polygon fills
+              border.col = "black",        ## Color for the polygon lines
+              border.alpha = 0.75,          ## Transparency for the polygon lines
+              lwd = 0.6,
+              legend.show = TRUE) +
+  tm_shape(nc_st_poly) +
+  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
+  tm_layout(inner.margins = rep(0.015, 4),
+            outer.margins = c(0.03,0,0.01,0),
+            frame = FALSE)
+nc_imm_vacc_map_S6
+
+tmap_save(nc_imm_vacc_map_S6, 
+          filename = "sensitivity analysis/maps/S6/imm_vac_delta_start_S6.png", 
           width = 1000,
           dpi = 140)
 
