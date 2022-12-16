@@ -638,7 +638,7 @@ nc_imm_vacc_map_S1 <-
 nc_imm_vacc_map_S1
 
 tmap_save(nc_imm_vacc_map_S1, 
-          filename = "sensitivity analysis/maps/imm_vac_delta_start_S1.png", 
+          filename = "sensitivity analysis/maps/S1/imm_vac_delta_start_S1.png", 
           width = 1000,
           dpi = 140)
 
