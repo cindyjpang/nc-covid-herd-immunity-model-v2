@@ -52,18 +52,18 @@ immunity_scenarios_raw <- immunity_est %>%
          overall_cdc_indep = cdc_case_vacc_obs_imm, 
          overall_cdc_upper = cdc_case_vacc_obs_imm_up, 
          overall_cdc_lower = cdc_case_vacc_obs_imm_lower, # max(cum_cdc_multiplier_cases, cum_vacc_est_obs)
-         infection_cdc_indep = ((cum_cdc_multiplier_cases-joint_cdc_case_obs)/Population)*100,
+         infection_cdc_indep = ((cum_cdc_multiplier_cases)/Population)*100,
          infection_cdc_upper = (cum_cdc_multiplier_cases/Population)*100,
-         vaccination_cdc_indep = ((cum_vacc_est_obs - joint_cdc_case_obs)/Population)*100, 
+         vaccination_cdc_indep = ((cum_vacc_est_obs)/Population)*100, 
          vaccination_cdc_upper = (cum_vacc_est_obs/Population)*100, 
          
          ### DEATH INF SCENARIOS
          overall_death_indep = death_inf_vacc_obs_imm, 
          overall_death_upper = death_inf_vacc_obs_imm_up, 
          overall_death_lower = death_inf_vacc_obs_imm_lower, 
-         infection_death_indep = ((cum_death_inf_cases - joint_death_inf_obs)/Population)*100,
+         infection_death_indep = ((cum_death_inf_cases)/Population)*100,
          infection_death_upper = (cum_death_inf_cases/Population)*100,
-         vaccination_death_indep = ((cum_vacc_est_obs - joint_death_inf_obs)/Population)*100,
+         vaccination_death_indep = ((cum_vacc_est_obs)/Population)*100,
          vaccination_death_upper = (cum_vacc_est_obs/Population)*100)
 
 # HELPER FNC FOR 
@@ -171,8 +171,12 @@ S6_DAT <- lower_bound_sort %>%
         all = FALSE)%>%
   mutate(excess = infection_only_death_pct_lower - vaccination_only_death_pct_lower)
 
-
-
+write_xlsx(S1_DAT, "./sensitivity analysis/outputs/S1/S1_start_immunity.xlsx")
+write_xlsx(S2_DAT, "./sensitivity analysis/outputs/S2/S2_start_immunity.xlsx")
+write_xlsx(S3_DAT, "./sensitivity analysis/outputs/S3/S3_start_immunity.xlsx")
+write_xlsx(S4_DAT, "./sensitivity analysis/outputs/S4/S4_start_immunity.xlsx")
+write_xlsx(S5_DAT, "./sensitivity analysis/outputs/S5/S5_start_immunity.xlsx")
+write_xlsx(S6_DAT, "./sensitivity analysis/outputs/S1/S6_start_immunity.xlsx")
 
 
 
