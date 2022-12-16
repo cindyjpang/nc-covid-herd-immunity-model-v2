@@ -15,26 +15,28 @@ library(ggExtra)
 
 ## Start looping through sensitivity analysis, construct one master dataframe w all parameters
 immunity_components <- data.frame()
+
+#all_scenarios_immunity <- read_xlsx("./sensitivity analysis/outputs/all_scenarios_start_immunity.xlsx")
 for (s in c(paste0("S", 1:6))) {
-  
+
   dat <- read_excel(paste0("sensitivity analysis/outputs/",
                            s,
                            "/",
                            s,
                            "_start_immunity.xlsx"))%>%
     mutate(scenario = s)
- 
-  ## get peaks 
+
+  ## get peaks
   peaks <- read_excel(paste0("sensitivity analysis/outputs/",
                            s,
                            "/delta_county_summary_",
                            s,
                            ".xlsx"))%>%
     select(COUNTY, peak_date, start_date)
-  
+
   ## If many entries for peak date, pick middle?
   if (nrow(peaks) > 100) {
-    
+
     # Get middle date for each
     peaks <- peaks %>% group_by(COUNTY) %>%
       summarize(peak_date = median(peak_date))
@@ -42,13 +44,10 @@ for (s in c(paste0("S", 1:6))) {
     peaks <- peaks %>%
       select(-start_date)
   }
-  master_dat <- merge(dat, 
-                      peaks, 
-                      by = "COUNTY",
-                      all = TRUE)
-  
-   immunity_components <- rbind(immunity_components, master_dat)
-    
+
+
+   immunity_components <- rbind(immunity_components, peaks)
+
 }
 
 
@@ -226,6 +225,7 @@ for(s in c(paste0("S", 1:6))){
                       type = "histogram",
                       fill = "grey",
                       color = "grey50")
+  imm
   ggsave(plot = imm, 
          filename = paste0("sensitivity analysis/plots/",s,"/scatter_imminf_immvacc_delta_",s,".png"), 
          device = "png",
@@ -234,3 +234,4 @@ for(s in c(paste0("S", 1:6))){
          units = "px")
   
 }
+
