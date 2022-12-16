@@ -56,7 +56,7 @@ imm_max <- max(immunity_components$immunity_all)
 imm_min <- min(c(immunity_components$immunity_by_infection,
                  immunity_components$immunity_by_vaccination))
 norm_breaks <- seq(10, 95, by = 2.5)
-
+ylims <- c(0,25)
 
 for(s in c(paste0("S", 1:6))){
   df <- filter(immunity_components, scenario == s)
@@ -75,7 +75,7 @@ for(s in c(paste0("S", 1:6))){
     geom_histogram(fill = "gray", 
                    color = "gray50",
                    breaks = norm_breaks) +
-    scale_y_continuous(limits = c(0, 21),
+    scale_y_continuous(limits = ylims,
                        expand = expansion(add = 0.5)) +
     scale_x_continuous(expand = expansion(add = 1)) +
     xlab("Immunity by Infection (%)") +
@@ -105,7 +105,7 @@ for(s in c(paste0("S", 1:6))){
     geom_histogram(fill = "gray", 
                    color = "gray50",
                    breaks = norm_breaks) +
-    scale_y_continuous(limits = c(0, 21),
+    scale_y_continuous(limits = ylims,
                        expand = expansion(add = 0.5)) +
     scale_x_continuous(expand = expansion(add = 1)) +
     xlab("Immunity by Vaccination (%)") +
@@ -135,7 +135,7 @@ for(s in c(paste0("S", 1:6))){
     geom_histogram(fill = "gray", 
                    color = "gray50",
                    breaks = norm_breaks) +
-    scale_y_continuous(limits = c(0, 21),
+    scale_y_continuous(limits = ylims,
                        expand = expansion(add = 0.5)) +
     scale_x_continuous(expand = expansion(add = 1)) +
     xlab("Overall Immunity (%)") +
