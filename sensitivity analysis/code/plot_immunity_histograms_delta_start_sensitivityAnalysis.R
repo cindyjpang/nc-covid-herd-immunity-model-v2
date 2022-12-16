@@ -10,6 +10,7 @@ library(RColorBrewer)
 library(tidyverse)
 library(ggthemes)
 library(dplyr)
+library(ggExtra)
 
 
 ## Start looping through sensitivity analysis, construct one master dataframe w all parameters
@@ -190,41 +191,46 @@ for(s in c(paste0("S", 1:6))){
   ###'
   ###'
   ###'
-  ###' Plot start vs peak date, response to R.
+  ###' Scatterplot with histograms
   ###' 
   ###' 
   ###' 
-  ###
-  ref.date <- as.Date("2021-01-01")
-  start.peak.cor.df <- data.frame(start_date = df$DATE, 
-                                  peak_date = df$peak_date)%>%
-    mutate(ref.start = as.numeric(difftime(start_date, ref.date, units = "days")),
-           ref.peak = as.numeric(difftime(peak_date, ref.date, units = "days")))
-  cor.start.peak <- cor.test(start.peak.cor.df$ref.start, start.peak.cor.df$ref.peak)
   
-  # pval = 0.0002100211
+  mult_value <- 0.055
+  text_size <- 3.5
   
-  delta_start_peak_cor <- ggplot(df, aes(x = DATE, y = peak_date))+
-    geom_point()+
-    xlab("Start Date")+
-    ylab("Peak Date")+
-    theme_pander()+
-    geom_text(x = as.Date("2021-05-13"),
-              y = as.Date("2021-10-01"),
-              hjust = 0,
-              label = paste0("R = ", round(cor.start.peak$estimate, digits = 2)),
-              size = text_size+3)+
-    geom_text(x = as.Date("2021-05-13"),
-              y = as.Date("2021-09-28"),
-              hjust = 0,
-              label = ifelse(round(cor.start.peak$p.value, digits = 2) < 0.01,"p < 0.01", round(cor.start.peak$p.value, digits = 2)),
-              size = text_size+3)
+  imm <-  
+    ggplot(data = df,
+           aes(x = immunity_by_infection,
+               y = immunity_by_vaccination)) +
+    geom_point() +
+    scale_y_continuous(expand = expansion(mult = mult_value)) +
+    scale_x_continuous(expand = expansion(mult = mult_value)) +
+    xlab("Immunity via Infection (%)") +
+    ylab("Immunity via Vaccination (%)") +
+    # geom_text(x = 210,
+    #           y = 8,
+    #           hjust = 0,
+    #           label = paste0("R = ", round(inf_peak_tot_cor$estimate, 2)),
+    #           size = text_size) +
+    # geom_text(x = 210,
+    #           y = 6.25,
+    #           hjust = 0,
+    #           label = "p < 0.01",
+    #           size = text_size) +
+    theme_bw() +  
+    theme(axis.text.y = element_text(margin = margin(r = 2)),
+          plot.margin = margin(10, 4, 7, 4))
   
-  ggsave(plot = delta_start_peak_cor, 
-         filename = paste0("sensitivity analysis/plots/",s,"/scatterplots_start_peak_",s,".png"), 
+  imm_h <- ggMarginal(imm, 
+                      type = "histogram",
+                      fill = "grey",
+                      color = "grey50")
+  ggsave(plot = imm, 
+         filename = paste0("sensitivity analysis/plots/",s,"/scatter_imminf_immvacc_delta_",s,".png"), 
          device = "png",
-         width = 1200,
-         height = 800,
+         width = 1300,
+         height = 900,
          units = "px")
   
 }
