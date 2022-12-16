@@ -20,6 +20,12 @@ shp <- st_read("data/cartographic_boundaries/cb_2018_nc_county_5m.shp")
 immunity_est <- read_excel("exported data/immunity_est.xlsx")
 immunity_dat <- read_excel("exported data/immunity_vc.xlsx")
 
+immunity_dat$COUNTY <- toupper(immunity_dat$COUNTY)
+names(immunity_dat)[1] <- 'CO_NAME'
+immunity_est$COUNTY <- toupper(immunity_est$COUNTY)
+names(immunity_est)[1] <- 'CO_NAME'
+shp$CO_NAME <- toupper(shp$NAME)
+
 
 ## Start looping through sensitivity analysis
 for (s in c(paste0("S", 1:6))) {
@@ -33,11 +39,20 @@ dat <- read_excel(paste0("sensitivity analysis/outputs/",
 ## change and merge data
 dat$COUNTY <- toupper(dat$COUNTY)
 names(dat)[1] <- 'CO_NAME'
-immunity_dat$COUNTY <- toupper(immunity_dat$COUNTY)
-names(immunity_dat)[1] <- 'CO_NAME'
-immunity_est$COUNTY <- toupper(immunity_est$COUNTY)
-names(immunity_est)[1] <- 'CO_NAME'
-shp$CO_NAME <- toupper(shp$NAME)
+
+## If many entries for peak date, pick middle?
+if (nrow(dat) > 100) {
+  
+  # Get middle date for each
+  dat_summary <- dat %>% group_by(CO_NAME) %>%
+    summarize(peak_date_median = median(peak_date))
+  
+  # Join, subset
+  dat %<>% merge(dat_summary,
+                 by = "CO_NAME")
+  dat %<>% filter(peak_date == peak_date_median)
+  
+}
 
 ## merge
 nc_dat <- merge(shp,

@@ -11,6 +11,7 @@ library(tidyverse)
 library(tmap)
 library(magrittr)
 library(lubridate)
+library(ggExtra)
 
 
 ## Assumes working directory is "code_vc" (top level!)
@@ -19,6 +20,12 @@ library(lubridate)
 shp <- st_read("data/cartographic_boundaries/cb_2018_nc_county_5m.shp")
 immunity_est <- read_excel("exported data/immunity_est.xlsx")
 immunity_dat <- read_excel("exported data/immunity_vc.xlsx")
+
+immunity_dat$COUNTY <- toupper(immunity_dat$COUNTY)
+names(immunity_dat)[1] <- 'CO_NAME'
+immunity_est$COUNTY <- toupper(immunity_est$COUNTY)
+names(immunity_est)[1] <- 'CO_NAME'
+shp$CO_NAME <- toupper(shp$NAME)
 
 
 ## Start looping through sensitivity analysis
@@ -33,11 +40,20 @@ dat <- read_excel(paste0("sensitivity analysis/outputs/",
 ## change and merge data
 dat$COUNTY <- toupper(dat$COUNTY)
 names(dat)[1] <- 'CO_NAME'
-immunity_dat$COUNTY <- toupper(immunity_dat$COUNTY)
-names(immunity_dat)[1] <- 'CO_NAME'
-immunity_est$COUNTY <- toupper(immunity_est$COUNTY)
-names(immunity_est)[1] <- 'CO_NAME'
-shp$CO_NAME <- toupper(shp$NAME)
+
+## If many entries for peak date, pick middle?
+if (nrow(dat) > 100) {
+  
+  # Get middle date for each
+  dat_summary <- dat %>% group_by(CO_NAME) %>%
+    summarize(peak_date_median = median(peak_date))
+  
+  # Join, subset
+  dat %<>% merge(dat_summary,
+                 by = "CO_NAME")
+  dat %<>% filter(peak_date == peak_date_median)
+  
+}
 
 ## merge
 nc_dat <- merge(shp,
@@ -126,114 +142,57 @@ nc_st_poly <- immunity_components %>% summarize()
 ###'
 ###'
 ###'
-###' Plot peak infection rate map
+###' Scatterplot with histograms
 ###' 
 ###' 
 ###' 
-###' 
-
-### Some magic to fix a legend issue
-# Create new bbox from original layer
-bbox_new <- st_bbox(immunity_components)
-# Add some to Y max and Y min
-# Y min
-bbox_new[2] <- bbox_new[2] - 80000
-# Y max
-# bbox_new[4] <- bbox_new[4] + 25000
-# Create sf object
-bbox_new %<>% st_as_sfc()
 
 ## Calculate per 10,000
 immunity_components$peak_inf_rate10000 <- immunity_components$peak_inf_rate * 10000
 
-### Get some values for mapping
-inf_max <- max(immunity_components$peak_inf_rate10000)
-inf_min <- min(immunity_components$peak_inf_rate10000)
-norm_breaks <- c(-Inf, 75, 100, 125, 150, 200, Inf)
-norm_colors <- brewer.pal(7, "YlOrBr")
-
-peak_infrate_map <- 
-  tm_shape(immunity_components,
-           bbox = bbox_new) + 
-  tm_polygons("peak_inf_rate10000",
-              palette = norm_colors, 
-              breaks = norm_breaks,
-              # style = "jenks",
-              title = "Peak Weekly Infection \nRate per 10,000 people",
-              border.col = "black",        ## Color for the polygon lines
-              border.alpha = 0.75,          ## Transparency for the polygon lines
-              lwd = 0.6,) +
-  tm_shape(nc_st_poly) +
-  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
-  tm_layout(#legend.outside = TRUE,
-            # title.size = 5,
-            # legend.height = 0.5,
-            # legend.text.size = 1,
-            # legend.title.size = 1,
-            inner.margins = rep(0.015, 4),
-            outer.margins = c(0.03,0,0.01,0),
-            frame = FALSE)
-
-tmap_save(peak_infrate_map, 
-          filename = paste0("sensitivity analysis/maps/", s, "/peak_inf_rate_", s, ".png"), 
-          width = 800,
-          dpi = 140)
-
-
-###'
-###'
-###'
-###' Plot total infections map
-###' 
-###' 
-###' 
-###' 
-
-### Some magic to fix a legend issue
-# Create new bbox from original layer
-bbox_new <- st_bbox(immunity_components)
-# Add some to Y max and Y min
-# Y min
-bbox_new[2] <- bbox_new[2] - 40000
-# Y max
-# bbox_new[4] <- bbox_new[4] + 25000
-# Create sf object
-bbox_new %<>% st_as_sfc()
-
 ## Calculate percent
 immunity_components$inf_est_delta_pct <- immunity_components$inf_est_delta_prop * 100
 
-### Get some values for mapping
-inf_max <- max(immunity_components$inf_est_delta_pct)
-inf_min <- min(immunity_components$inf_est_delta_pct)
-norm_breaks <- c(-Inf, 10, 15, 20, 25, Inf)
-norm_colors <- brewer.pal(5, "RdPu")
+## Calculate correlation
+inf_peak_tot_cor <- cor.test(immunity_components$peak_inf_rate, immunity_components$inf_est_delta_pct)
 
+mult_value <- 0.055
+text_size <- 3.5
 
-delta_inf_map <-
-  tm_shape(immunity_components,
-           bbox = bbox_new) + 
-  tm_polygons("inf_est_delta_pct",
-              palette = norm_colors, 
-              breaks = norm_breaks,
-              # style = "quantile",
-              title = "Total Infected (%)",
-              border.col = "black",        ## Color for the polygon lines
-              border.alpha = 0.75,          ## Transparency for the polygon lines
-              lwd = 0.6,) +
-  tm_shape(nc_st_poly) +
-  tm_borders(col = "black", lwd = 1, alpha = 0.85) +
-  tm_layout(#legend.outside = TRUE,
-            #legend.height = 0.2,
-            # legend.text.size = 1,
-            # legend.title.size = 1.75,
-            inner.margins = rep(0.015, 4),
-            outer.margins = c(0.03,0,0.01,0),
-            frame = FALSE)
+inf_stdate <-  
+  ggplot(data = st_drop_geometry(immunity_components),
+         aes(x = peak_inf_rate10000,
+             y = inf_est_delta_pct)) +
+  geom_point() +
+  scale_y_continuous(expand = expansion(mult = mult_value)) +
+  scale_x_continuous(expand = expansion(mult = mult_value)) +
+  xlab("Peak Weekly Infection Rate (per 10,000 people)") +
+  ylab("Total Infected (%)") +
+  geom_text(x = 210,
+            y = 8,
+            hjust = 0,
+            label = paste0("R = ", round(inf_peak_tot_cor$estimate, 2)),
+            size = text_size) +
+  geom_text(x = 210,
+            y = 6.25,
+            hjust = 0,
+            label = "p < 0.01",
+            size = text_size) +
+  theme_bw() +  
+  theme(axis.text.y = element_text(margin = margin(r = 2)),
+        plot.margin = margin(10, 4, 7, 4))
 
-tmap_save(delta_inf_map, 
-          filename = paste0("sensitivity analysis/maps/", s, "/total_inf_delta_", s, ".png"), 
-          width = 800,
-          dpi = 140)
+inf_stdate_h <- ggMarginal(inf_stdate, 
+                           type = "histogram",
+                           fill = "grey",
+                           color = "grey50")
+
+ggsave(plot = inf_stdate_h, 
+       filename = paste0("scatter_peakinf_totalinf_delta_", s, ".png"), 
+       path = paste0("sensitivity analysis/maps/", s), 
+       device = "png",
+       width = 1200,
+       height = 1000,
+       units = "px")
 
 }
