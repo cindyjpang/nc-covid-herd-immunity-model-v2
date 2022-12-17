@@ -16,7 +16,7 @@ library(ggExtra)
 ## Start looping through sensitivity analysis, construct one master dataframe w all parameters
 immunity_components <- data.frame()
 
-#all_scenarios_immunity <- read_xlsx("./sensitivity analysis/outputs/all_scenarios_start_immunity.xlsx")
+all_scenarios_immunity <- read_xlsx("./sensitivity analysis/outputs/all_scenarios_start_immunity.xlsx")
 for (s in c(paste0("S", 1:6))) {
 
   dat <- read_excel(paste0("sensitivity analysis/outputs/",
